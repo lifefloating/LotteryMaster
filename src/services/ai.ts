@@ -6,6 +6,9 @@ import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../config/prompts';
 class AIService {
   private readonly API_KEY = process.env.API_KEY;
   private readonly API_URL = process.env.API_URL as string;
+  private readonly API_TIMEOUT = parseInt(process.env.API_TIMEOUT || '120000');
+  private readonly TEMPERATURE = parseFloat(process.env.API_TEMPERATURE || '0.7');
+  private readonly MAX_TOKENS = parseInt(process.env.API_MAX_TOKENS || '2000');
 
   async analyzeLotteryData(filename: string): Promise<string> {
     try {
@@ -35,15 +38,15 @@ class AIService {
               content: prompt,
             },
           ],
-          temperature: 0.7,
-          max_tokens: 2000,
+          temperature: this.TEMPERATURE,
+          max_tokens: this.MAX_TOKENS,
         },
         {
           headers: {
             Authorization: `Bearer ${this.API_KEY}`,
             'Content-Type': 'application/json',
           },
-          timeout: 120000,
+          timeout: this.API_TIMEOUT,
         }
       );
 
