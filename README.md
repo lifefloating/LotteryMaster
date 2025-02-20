@@ -79,6 +79,10 @@
 curl http://localhost:3008/api/health
 ```
 
+### 🖼️ 接口测试图
+
+![分析接口测试结果](./images/analyze_result.png)
+
 ### 📝 TODO
   - 尝试切换deepseek或者其他的测试比较一下
   - 做成通用类型对，支持多种模型
