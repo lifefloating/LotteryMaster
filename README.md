@@ -22,7 +22,7 @@
 ### ⚙️ 环境要求 (Prerequisites)
 
 - [Node.js](https://nodejs.org/en/download/):  版本 >= 18.0 (推荐使用最新LTS版本)
-- [npm](https://www.npmjs.com/) 或 [yarn](https://yarnpkg.com/):  包管理器 (推荐使用npm)
+- [pnpm](https://pnpm.io/) 或 [yarn](https://yarnpkg.com/):  包管理器 (推荐使用pnpm)
 - [通义千问 Qwen-MAX API Key](https://tongyi.aliyun.com/qianwen/):  需要开通阿里云通义千问服务并获取API密钥
 
 ### 👣 步骤 (Steps)
