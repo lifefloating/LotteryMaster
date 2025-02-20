@@ -27,11 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Excel files
-*.xlsx
-*.xls
+# *.xlsx
+# *.xls
 
 # OS files
 .DS_Store
 Thumbs.db
-
-.windsurfrules
