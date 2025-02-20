@@ -26,9 +26,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Excel files
-# *.xlsx
-# *.xls
+Excel files
+*.xlsx
+*.xls
 
 # OS files
 .DS_Store
