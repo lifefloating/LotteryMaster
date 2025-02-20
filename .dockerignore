@@ -1,0 +1,6 @@
+node_modules
+Dockerfile
+.git
+.dockerignore
+**/*.md
+**/*.spec.ts

@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3008;
 const app = express();
 app.use(express.json());
 
-app.get('/api', async (req, res) => {
+app.get('/api/health', async (req, res) => {
   try {
     res.json({ success: true, message: 'Welcome to the lottery API' });
   } catch (error) {
