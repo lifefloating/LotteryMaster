@@ -1,14 +1,15 @@
 import axios, { AxiosError } from 'axios';
 import * as XLSX from 'xlsx';
 import { LotteryData } from '../types/lottery';
-import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../config/prompts';
+import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../prompt/prompts';
+import config from '../config';
 
 class AnalyzeService {
-  private readonly API_KEY = process.env.API_KEY;
-  private readonly API_URL = process.env.API_URL as string;
-  private readonly API_TIMEOUT = parseInt(process.env.API_TIMEOUT || '120000');
-  private readonly TEMPERATURE = parseFloat(process.env.API_TEMPERATURE || '0.7');
-  private readonly MAX_TOKENS = parseInt(process.env.API_MAX_TOKENS || '2000');
+  private readonly API_KEY = config.API_KEY;
+  private readonly API_URL = config.API_URL;
+  private readonly API_TIMEOUT = config.API_TIMEOUT;
+  private readonly TEMPERATURE = config.API_TEMPERATURE;
+  private readonly MAX_TOKENS = config.API_MAX_TOKENS;
 
   async analyzeLotteryData(filename: string): Promise<string> {
     try {
@@ -76,7 +77,7 @@ class AnalyzeService {
 
   private buildAnalysisPrompt(data: LotteryData[]): string {
     try {
-      const recentCount = parseInt(process.env.RECENT_DATA_COUNT || '50');
+      const recentCount = config.RECENT_DATA_COUNT;
       const recentData = data.slice(0, recentCount);
       console.log(`Building prompt with ${recentData.length} recent records`);
 

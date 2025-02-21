@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
+import config from './config'; // Import config
 
 import scraper from './services/scraper';
 import analyzeService from './services/analyze';
@@ -9,14 +10,14 @@ dotenv.config();
 
 // eslint-disable-next-line no-console
 console.log('Environment variables loaded:', {
-  PORT: process.env.PORT,
-  SSQ_URL: process.env.SSQ_URL,
-  DLT_URL: process.env.DLT_URL,
-  DATA_PATH: process.env.DATA_PATH,
+  PORT: config.PORT,
+  SSQ_URL: config.SSQ_URL,
+  DLT_URL: config.DLT_URL,
+  DATA_PATH: config.DATA_PATH,
 });
 
-const DATA_PATH = process.env.DATA_PATH ?? 'lottery_data';
-const PORT = parseInt(process.env.PORT || '3008', 10);
+const DATA_PATH = config.DATA_PATH;
+const PORT = config.PORT;
 const HOST = '0.0.0.0';
 
 const app = Fastify({

@@ -5,14 +5,15 @@ import { LotteryData, ScrapedData } from '../types/lottery';
 import iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as path from 'path';
+import config from '../config'; // Import config
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isValidNumber = (n: any): boolean => typeof n === 'number' && Number.isFinite(n);
 
 class LotteryScraper {
-  private readonly SSQ_URL = process.env.SSQ_URL as string;
-  private readonly DLT_URL = process.env.DLT_URL as string;
-  private readonly DATA_DIR = 'lottery_data';
+  private readonly SSQ_URL = config.SSQ_URL;
+  private readonly DLT_URL = config.DLT_URL;
+  private readonly DATA_DIR = config.DATA_PATH;
 
   constructor() {
     if (!fs.existsSync(this.DATA_DIR)) {
