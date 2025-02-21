@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import { LotteryData } from '../types/lottery';
 import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../config/prompts';
 
-class AIService {
+class AnalyzeService {
   private readonly API_KEY = process.env.API_KEY;
   private readonly API_URL = process.env.API_URL as string;
   private readonly API_TIMEOUT = parseInt(process.env.API_TIMEOUT || '120000');
@@ -91,4 +91,4 @@ class AIService {
   }
 }
 
-export default new AIService();
+export default new AnalyzeService();

@@ -12,7 +12,7 @@ console.log('Environment variables loaded:', {
 
 import express from 'express';
 import scraper from './services/scraper';
-import aiService from './services/ai';
+import analyzeService from './services/analyze';
 
 const DATA_PATH = process.env.DATA_PATH ?? 'lottery_data';
 const PORT = process.env.PORT || 3008;
@@ -50,7 +50,7 @@ app.get('/api/analyze/ssq', async (req, res) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
-    const analysis = await aiService.analyzeLotteryData(fileName);
+    const analysis = await analyzeService.analyzeLotteryData(fileName);
     res.json({ success: true, analysis });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
@@ -61,7 +61,7 @@ app.get('/api/analyze/dlt', async (req, res) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
-    const analysis = await aiService.analyzeLotteryData(fileName);
+    const analysis = await analyzeService.analyzeLotteryData(fileName);
     res.json({ success: true, analysis });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
