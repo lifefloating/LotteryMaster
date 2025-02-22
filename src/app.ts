@@ -8,7 +8,6 @@ import analyzeService from './services/analyze';
 
 dotenv.config();
 
-// eslint-disable-next-line no-console
 console.log('Environment variables loaded:', {
   PORT: config.PORT,
   SSQ_URL: config.SSQ_URL,
@@ -34,7 +33,7 @@ app.get('/api/scrape/ssq', async () => {
   return {
     success: result.success,
     message: result.message,
-    isNewFile: result.isNewFile
+    isNewFile: result.isNewFile,
   };
 });
 
@@ -43,7 +42,7 @@ app.get('/api/scrape/dlt', async () => {
   return {
     success: result.success,
     message: result.message,
-    isNewFile: result.isNewFile
+    isNewFile: result.isNewFile,
   };
 });
 

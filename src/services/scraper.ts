@@ -7,7 +7,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config'; // Import config
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isValidNumber = (n: any): boolean => typeof n === 'number' && Number.isFinite(n);
 
 class LotteryScraper {
@@ -46,7 +45,7 @@ class LotteryScraper {
           success: true,
           message: `SSQ data file for ${today} already exists`,
           fileName: filename,
-          isNewFile: false
+          isNewFile: false,
         };
       }
 
@@ -83,7 +82,7 @@ class LotteryScraper {
         success: true,
         message: `Successfully created new SSQ data file for ${today}`,
         fileName: filename,
-        isNewFile: true
+        isNewFile: true,
       };
     } catch (error) {
       console.error('Error scraping SSQ data:', error);
@@ -104,7 +103,7 @@ class LotteryScraper {
           success: true,
           message: `DLT data file for ${today} already exists`,
           fileName: filename,
-          isNewFile: false
+          isNewFile: false,
         };
       }
 
@@ -140,7 +139,7 @@ class LotteryScraper {
         success: true,
         message: `Successfully created new DLT data file for ${today}`,
         fileName: filename,
-        isNewFile: true
+        isNewFile: true,
       };
     } catch (error) {
       console.error('Error scraping DLT data:', error);
@@ -164,7 +163,6 @@ class LotteryScraper {
       return true;
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sheetData: any[][] = [];
     if (filename.includes('dlt')) {
       // 大乐透表头

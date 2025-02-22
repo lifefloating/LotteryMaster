@@ -17,7 +17,6 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
     "paths": {
       "src/*": [
         "src/*"
@@ -31,6 +30,7 @@
   "exclude": [
     "node_modules",
     "dist",
+    "dev",
     "dev/examples"
   ],
   "ts-node": {
