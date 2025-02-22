@@ -13,6 +13,8 @@ interface Config {
   API_TEMPERATURE: number;
   API_MAX_TOKENS: number;
   RECENT_DATA_COUNT: number;
+  SSQ_FILE_PREFIX: string;
+  DLT_FILE_PREFIX: string;
 }
 
 const config: Config = {
@@ -26,6 +28,8 @@ const config: Config = {
   API_TEMPERATURE: parseFloat(process.env.API_TEMPERATURE || '0.7'),
   API_MAX_TOKENS: parseInt(process.env.API_MAX_TOKENS || '2000', 10),
   RECENT_DATA_COUNT: parseInt(process.env.RECENT_DATA_COUNT || '50', 10),
+  SSQ_FILE_PREFIX: process.env.SSQ_FILE_PREFIX || 'ssq_data_',
+  DLT_FILE_PREFIX: process.env.DLT_FILE_PREFIX || 'dlt_data_',
 };
 
 export default config;

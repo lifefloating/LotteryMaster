@@ -9,3 +9,10 @@ export interface ScrapedData {
   type: 'ssq' | 'dlt'; // ssq: 双色球, dlt: 大乐透
   data: LotteryData[];
 }
+
+export interface ScrapeResult {
+  success: boolean;
+  message: string;
+  fileName?: string;
+  isNewFile: boolean;
+}

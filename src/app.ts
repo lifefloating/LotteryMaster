@@ -30,13 +30,21 @@ app.get('/api/health', async () => {
 });
 
 app.get('/api/scrape/ssq', async () => {
-  const data = await scraper.scrapeSSQ();
-  return { success: true, data };
+  const result = await scraper.scrapeSSQ();
+  return {
+    success: result.success,
+    message: result.message,
+    isNewFile: result.isNewFile
+  };
 });
 
 app.get('/api/scrape/dlt', async () => {
-  const data = await scraper.scrapeDLT();
-  return { success: true, data };
+  const result = await scraper.scrapeDLT();
+  return {
+    success: result.success,
+    message: result.message,
+    isNewFile: result.isNewFile
+  };
 });
 
 app.get('/api/analyze/ssq', async () => {

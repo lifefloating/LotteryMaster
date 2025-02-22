@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as XLSX from 'xlsx';
-import { LotteryData, ScrapedData } from '../types/lottery';
+import { LotteryData, ScrapeResult } from '../types/lottery';
 import iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,6 +14,8 @@ class LotteryScraper {
   private readonly SSQ_URL = config.SSQ_URL;
   private readonly DLT_URL = config.DLT_URL;
   private readonly DATA_DIR = config.DATA_PATH;
+  private readonly SSQ_PREFIX = config.SSQ_FILE_PREFIX;
+  private readonly DLT_PREFIX = config.DLT_FILE_PREFIX;
 
   constructor() {
     if (!fs.existsSync(this.DATA_DIR)) {
@@ -21,15 +23,31 @@ class LotteryScraper {
     }
   }
 
-  async scrapeSSQ(): Promise<ScrapedData> {
+  private deleteOldFiles(prefix: string): void {
+    const today = new Date().toISOString().slice(0, 10);
+    const files = fs.readdirSync(this.DATA_DIR);
+    files.forEach((file) => {
+      if (file.startsWith(prefix) && !file.includes(today)) {
+        fs.unlinkSync(path.join(this.DATA_DIR, file));
+      }
+    });
+  }
+
+  async scrapeSSQ(): Promise<ScrapeResult> {
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const filename = path.join(this.DATA_DIR, `ssq_data_${today}.xlsx`);
+      const filename = path.join(this.DATA_DIR, `${this.SSQ_PREFIX}${today}.xlsx`);
+
+      // Delete old SSQ files before checking/creating new one
+      this.deleteOldFiles(this.SSQ_PREFIX);
 
       if (fs.existsSync(filename)) {
-        // eslint-disable-next-line no-console
-        console.log(`SSQ data for today (${today}) already exists. Skipping.`);
-        return { type: 'ssq', data: [] };
+        return {
+          success: true,
+          message: `SSQ data file for ${today} already exists`,
+          fileName: filename,
+          isNewFile: false
+        };
       }
 
       const response = await axios.get(this.SSQ_URL, {
@@ -61,22 +79,33 @@ class LotteryScraper {
       });
 
       await this.saveToExcel(data, filename);
-      return { type: 'ssq', data };
+      return {
+        success: true,
+        message: `Successfully created new SSQ data file for ${today}`,
+        fileName: filename,
+        isNewFile: true
+      };
     } catch (error) {
       console.error('Error scraping SSQ data:', error);
       throw error;
     }
   }
 
-  async scrapeDLT(): Promise<ScrapedData> {
+  async scrapeDLT(): Promise<ScrapeResult> {
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const filename = path.join(this.DATA_DIR, `dlt_data_${today}.xlsx`);
+      const filename = path.join(this.DATA_DIR, `${this.DLT_PREFIX}${today}.xlsx`);
+
+      // Delete old DLT files before checking/creating new one
+      this.deleteOldFiles(this.DLT_PREFIX);
 
       if (fs.existsSync(filename)) {
-        // eslint-disable-next-line no-console
-        console.log(`DLT data for today (${today}) already exists. Skipping.`);
-        return { type: 'dlt', data: [] };
+        return {
+          success: true,
+          message: `DLT data file for ${today} already exists`,
+          fileName: filename,
+          isNewFile: false
+        };
       }
 
       const response = await axios.get(this.DLT_URL);
@@ -107,7 +136,12 @@ class LotteryScraper {
       });
 
       await this.saveToExcel(data, filename);
-      return { type: 'dlt', data };
+      return {
+        success: true,
+        message: `Successfully created new DLT data file for ${today}`,
+        fileName: filename,
+        isNewFile: true
+      };
     } catch (error) {
       console.error('Error scraping DLT data:', error);
       throw error;
