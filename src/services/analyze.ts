@@ -1,11 +1,15 @@
 import axios, { AxiosError } from 'axios';
 import * as XLSX from 'xlsx';
-import { LotteryData } from '../types/lottery';
-import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../prompt/prompts';
+import { LotteryData, AnalysisResult } from '../types/lottery';
+import { 
+  LOTTERY_ANALYSIS_TEMPLATE, 
+  STRUCTURED_ANALYSIS_TEMPLATE,
+  STRUCTURED_SYSTEM_PROMPT
+} from '../prompt/prompts';
 import config from '../config';
 
 interface CacheItem {
-  data: string;
+  data: AnalysisResult;
   timestamp: number;
 }
 
@@ -28,7 +32,7 @@ class AnalyzeService {
     return Date.now() - cacheItem.timestamp < this.CACHE_DURATION;
   }
 
-  async analyzeLotteryData(filename: string): Promise<string> {
+  async analyzeLotteryData(filename: string): Promise<AnalysisResult> {
     try {
       console.log(`Starting lottery data analysis for file: ${filename}`);
 
@@ -46,8 +50,8 @@ class AnalyzeService {
         return cachedResult.data;
       }
 
-      const prompt = this.buildAnalysisPrompt(data);
-      console.log('Built analysis prompt, sending request to AI service...');
+      const prompt = this.buildStructuredAnalysisPrompt(data);
+      console.log('Built structured analysis prompt, sending request to AI service...');
 
       const response = await axios.post(
         this.API_URL,
@@ -56,7 +60,7 @@ class AnalyzeService {
           messages: [
             {
               role: 'system',
-              content: SYSTEM_PROMPT,
+              content: STRUCTURED_SYSTEM_PROMPT,
             },
             {
               role: 'user',
@@ -77,14 +81,17 @@ class AnalyzeService {
 
       console.log('Successfully received response from AI service');
       const rawContent = response.data.choices[0].message.content;
-
+      
+      // 解析结构化数据和Markdown
+      const result = this.parseStructuredResponse(rawContent);
+      
       // 保存到缓存
       this.cache.set(cacheKey, {
-        data: rawContent,
+        data: result,
         timestamp: Date.now(),
       });
 
-      return rawContent;
+      return result;
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error('API Request Error:', {
@@ -105,16 +112,89 @@ class AnalyzeService {
       throw error;
     }
   }
+  
+  // 解析AI返回的结构化响应
+  private parseStructuredResponse(rawContent: string): AnalysisResult {
+    try {
+      console.log('Parsing structured response from AI');
+      
+      // 默认结果
+      const result: AnalysisResult = {
+        rawContent,
+        structured: {
+          frequencyAnalysis: { frontZone: [], backZone: [] },
+          hotColdAnalysis: { hotNumbers: [], coldNumbers: [], risingNumbers: [] },
+          missingAnalysis: { 
+            frontZone: { maxMissingNumber: 0, missingTrend: '', warnings: [] },
+            backZone: { missingStatus: '', warnings: [] }
+          },
+          trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
+          oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
+          recommendations: [],
+          riskWarnings: []
+        }
+      };
+      
+      // 提取JSON部分
+      const jsonMatch = rawContent.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch && jsonMatch[1]) {
+        try {
+          const jsonData = JSON.parse(jsonMatch[1]);
+          result.structured = jsonData;
+        } catch (jsonError) {
+          console.error('Error parsing JSON from AI response:', jsonError);
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error parsing structured response:', error);
+      // 返回原始内容作为备用
+      return {
+        rawContent,
+        structured: {
+          frequencyAnalysis: { frontZone: [], backZone: [] },
+          hotColdAnalysis: { hotNumbers: [], coldNumbers: [], risingNumbers: [] },
+          missingAnalysis: { 
+            frontZone: { maxMissingNumber: 0, missingTrend: '', warnings: [] },
+            backZone: { missingStatus: '', warnings: [] }
+          },
+          trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
+          oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
+          recommendations: [],
+          riskWarnings: []
+        },
+      };
+    }
+  }
 
-  private buildAnalysisPrompt(data: LotteryData[]): string {
+  // 构建传统分析提示
+  // private buildAnalysisPrompt(data: LotteryData[]): string {
+  //   try {
+  //     const recentCount = config.RECENT_DATA_COUNT;
+  //     const recentData = data.slice(0, recentCount);
+  //     console.log(`Building prompt with ${recentData.length} recent records`);
+
+  //     return LOTTERY_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
+  //   } catch (error) {
+  //     console.error('Error building analysis prompt:', {
+  //       error,
+  //       dataLength: data?.length,
+  //     });
+  //     throw error;
+  //   }
+  // }
+  
+  // 构建结构化分析提示
+  private buildStructuredAnalysisPrompt(data: LotteryData[]): string {
     try {
       const recentCount = config.RECENT_DATA_COUNT;
       const recentData = data.slice(0, recentCount);
-      console.log(`Building prompt with ${recentData.length} recent records`);
+      console.log(`Building structured prompt with ${recentData.length} recent records`);
 
-      return LOTTERY_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
+      return STRUCTURED_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
     } catch (error) {
-      console.error('Error building analysis prompt:', {
+      console.error('Error building structured analysis prompt:', {
         error,
         dataLength: data?.length,
       });

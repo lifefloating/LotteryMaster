@@ -68,7 +68,104 @@ export const LOTTERY_ANALYSIS_TEMPLATE = `请分析以下彩票数据，并提�
 
 请用清晰的语言描述分析结果，避免使用复杂的数学术语，便于普通用户理解。`;
 
-export const SYSTEM_PROMPT = `你是一个专业的彩票数据分析师，擅长：
+export const STRUCTURED_ANALYSIS_TEMPLATE = `请分析以下彩票数据，并提供一份结构化的分析报告。
+
+你需要返回两种格式：
+1. 一个JSON格式的结构化数据，便于前端处理
+2. 一个Markdown格式的美观报告，便于直接展示
+
+数据如下：
+\${data}
+
+请按照以下JSON结构返回分析结果（必须是有效的JSON格式）：
+
+\`\`\`json
+{
+  "frequencyAnalysis": {
+    "frontZone": [
+      {"number": 数字, "frequency": 频率},
+      ...（按频率排序，列出前5个）
+    ],
+    "backZone": [
+      {"number": 数字, "frequency": 频率},
+      ...（按频率排序，列出前3个）
+    ]
+  },
+  "hotColdAnalysis": {
+    "hotNumbers": [最近10期热门号码],
+    "coldNumbers": [长期未出现的冷门号码],
+    "risingNumbers": [值得关注的转热号码]
+  },
+  "missingAnalysis": {
+    "frontZone": {
+      "maxMissingNumber": 当前最大遗漏号码,
+      "missingTrend": "近期遗漏走势描述",
+      "warnings": ["遗漏值预警提示1", "遗漏值预警提示2"]
+    },
+    "backZone": {
+      "missingStatus": "当前遗漏状况描述",
+      "warnings": ["遗漏值异常提醒"]
+    }
+  },
+  "trendAnalysis": {
+    "frontZoneFeatures": ["前区走势特征1", "前区走势特征2"],
+    "backZoneFeatures": ["后区走势特征"],
+    "keyTurningPoints": ["关键走势拐点描述"]
+  },
+  "oddEvenAnalysis": {
+    "frontZoneRatio": "前区奇偶比描述",
+    "backZoneRatio": "后区奇偶比描述",
+    "recommendedRatio": "推荐的奇偶比"
+  },
+  "recommendations": [
+    {
+      "frontZone": [推荐前区号码组合1],
+      "backZone": [推荐后区号码组合1]
+    },
+    {
+      "frontZone": [推荐前区号码组合2],
+      "backZone": [推荐后区号码组合2]
+    },
+    ...（提供3-5组推荐）
+  ],
+  "riskWarnings": [
+    "风险提示1",
+    "风险提示2",
+    "风险提示3"
+  ]
+}
+\`\`\`
+
+同时，请提供一个美观的Markdown格式报告，包含以上所有分析内容，但格式更适合阅读：
+
+\`\`\`markdown
+# 彩票数据分析报告
+
+## 一、数字出现频率分析
+...（此处填写详细的频率分析，使用Markdown格式美化）
+
+## 二、冷热号码分析
+...
+
+## 三、遗漏号分析
+...
+
+## 四、走势特征分析
+...
+
+## 五、奇偶比分析
+...
+
+## 六、推荐号码组合
+...
+
+## 七、风险提示
+...
+\`\`\`
+
+请确保JSON格式正确无误，可以被前端直接解析使用。`;
+
+export const STRUCTURED_SYSTEM_PROMPT = `你是一个专业的彩票数据分析师，擅长：
 1. 数据统计和概率分析
 2. 模式识别和趋势预测
 3. 历史数据分析
@@ -78,10 +175,17 @@ export const SYSTEM_PROMPT = `你是一个专业的彩票数据分析师，擅�
 7. 奇偶比例分析
 8. 风险评估
 
-请基于提供的数据进行分析，给出专业、客观的建议。
-注意：
-1. 重视遗漏值分析，关注补号机会
-2. 结合走势图进行立体分析
-3. 重点分析中奖注数分布规律
-4. 平衡奇偶比例，提供合理建议
-5. 始终提醒用户理性购彩，量力而行。`;
+你的任务是分析彩票数据并提供结构化的JSON数据，便于前端处理和展示。
+
+请确保JSON格式严格符合要求，可以被前端直接解析。
+
+在分析过程中，请特别注意：
+1. 数据的准确性和客观性
+2. 重视遗漏值分析，关注补号机会
+3. 结合走势图进行立体分析
+4. 重点分析中奖注数分布规律
+5. 平衡奇偶比例，提供合理建议
+6. 走势特征和规律识别
+7. 理性购彩的风险提示
+
+无论分析结果如何，都要提醒用户彩票有风险，投注需谨慎，量力而行。`;
