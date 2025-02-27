@@ -1,12 +1,14 @@
 import axios, { AxiosError } from 'axios';
 import * as XLSX from 'xlsx';
+import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
 import { STRUCTURED_ANALYSIS_TEMPLATE, STRUCTURED_SYSTEM_PROMPT } from '../prompt/prompts';
 import config from '../config';
 
 interface CacheItem {
   data: AnalysisResult;
-  timestamp: number;
+  id: string;
+  createdAt: number;
 }
 
 class AnalyzeService {
@@ -25,10 +27,10 @@ class AnalyzeService {
   }
 
   private isValidCache(cacheItem: CacheItem): boolean {
-    return Date.now() - cacheItem.timestamp < this.CACHE_DURATION;
+    return Date.now() - cacheItem.createdAt < this.CACHE_DURATION;
   }
 
-  async analyzeLotteryData(filename: string): Promise<AnalysisResult> {
+  async analyzeLotteryData(filename: string, type: 'SSQ' | 'DLT'): Promise<AnalysisResult> {
     try {
       console.log(`Starting lottery data analysis for file: ${filename}`);
 
@@ -56,7 +58,7 @@ class AnalyzeService {
           messages: [
             {
               role: 'system',
-              content: STRUCTURED_SYSTEM_PROMPT,
+              content: `${STRUCTURED_SYSTEM_PROMPT}\n\n当前分析的是${type === 'SSQ' ? '双色球' : '大乐透'}数据，请严格按照对应的号码规则进行分析。`,
             },
             {
               role: 'user',
@@ -103,7 +105,8 @@ class AnalyzeService {
       // 保存到缓存
       this.cache.set(cacheKey, {
         data: result,
-        timestamp: Date.now(),
+        id: uuidv4(),
+        createdAt: Date.now(),
       });
 
       return result;

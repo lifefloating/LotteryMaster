@@ -51,7 +51,7 @@ app.get('/api/scrape/dlt', async () => {
 app.get('/api/analyze/ssq', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
-  const analysis = await analyzeService.analyzeLotteryData(fileName);
+  const analysis = await analyzeService.analyzeLotteryData(fileName, 'SSQ');
   return {
     success: true,
     analysis: {
@@ -64,7 +64,7 @@ app.get('/api/analyze/ssq', async () => {
 app.get('/api/analyze/dlt', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
-  const analysis = await analyzeService.analyzeLotteryData(fileName);
+  const analysis = await analyzeService.analyzeLotteryData(fileName, 'DLT'  );
   return {
     success: true,
     analysis: {
@@ -77,7 +77,7 @@ app.get('/api/analyze/dlt', async () => {
 app.get('/api/analyze/ssq/long', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
-  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName);
+  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName, 'SSQ');
   return {
     success: true,
     analysis: {
@@ -90,7 +90,7 @@ app.get('/api/analyze/ssq/long', async () => {
 app.get('/api/analyze/dlt/long', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
-  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName);
+  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName, 'DLT');
   return {
     success: true,
     analysis: {
