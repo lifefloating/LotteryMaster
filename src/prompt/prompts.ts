@@ -92,9 +92,16 @@ export const STRUCTURED_ANALYSIS_TEMPLATE = `请分析以下彩票数据，并�
     ]
   },
   "hotColdAnalysis": {
-    "hotNumbers": [最近10期热门号码],
-    "coldNumbers": [长期未出现的冷门号码],
-    "risingNumbers": [值得关注的转热号码]
+    "frontZone": {
+      "hotNumbers": [前区最近10期热门号码],
+      "coldNumbers": [前区长期未出现的冷门号码],
+      "risingNumbers": [前区值得关注的转热号码]
+    },
+    "backZone": {
+      "hotNumbers": [后区最近10期热门号码],
+      "coldNumbers": [后区长期未出现的冷门号码],
+      "risingNumbers": [后区值得关注的转热号码]
+    }
   },
   "missingAnalysis": {
     "frontZone": {

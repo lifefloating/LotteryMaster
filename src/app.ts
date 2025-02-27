@@ -51,12 +51,12 @@ app.get('/api/analyze/ssq', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
   const analysis = await analyzeService.analyzeLotteryData(fileName);
-  return { 
-    success: true, 
+  return {
+    success: true,
     analysis: {
       raw: analysis.rawContent,
-      structured: analysis.structured
-    } 
+      structured: analysis.structured,
+    },
   };
 });
 
@@ -64,12 +64,12 @@ app.get('/api/analyze/dlt', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
   const analysis = await analyzeService.analyzeLotteryData(fileName);
-  return { 
-    success: true, 
+  return {
+    success: true,
     analysis: {
       raw: analysis.rawContent,
-      structured: analysis.structured
-    } 
+      structured: analysis.structured,
+    },
   };
 });
 
