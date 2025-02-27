@@ -6,6 +6,7 @@ import config from './config'; // Import config
 
 import scraper from './services/scraper';
 import analyzeService from './services/analyze';
+import longFileAnalyzeService from './services/longFileAnalyze';
 
 dotenv.config();
 
@@ -64,6 +65,32 @@ app.get('/api/analyze/dlt', async () => {
   const today = new Date().toISOString().slice(0, 10);
   const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
   const analysis = await analyzeService.analyzeLotteryData(fileName);
+  return {
+    success: true,
+    analysis: {
+      raw: analysis.rawContent,
+      structured: analysis.structured,
+    },
+  };
+});
+
+app.get('/api/analyze/ssq/long', async () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
+  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName);
+  return {
+    success: true,
+    analysis: {
+      raw: analysis.rawContent,
+      structured: analysis.structured,
+    },
+  };
+});
+
+app.get('/api/analyze/dlt/long', async () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
+  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName);
   return {
     success: true,
     analysis: {
@@ -134,6 +161,8 @@ const start = async (): Promise<void> => {
     console.log('- GET /api/scrape/dlt');
     console.log('- GET /api/analyze/ssq');
     console.log('- GET /api/analyze/dlt');
+    console.log('- GET /api/analyze/ssq/qwen');
+    console.log('- GET /api/analyze/dlt/qwen');
   } catch (err) {
     app.log.error(err);
     process.exit(1);
