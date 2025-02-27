@@ -4,16 +4,31 @@ import { LotteryData } from '../types/lottery';
 import { LOTTERY_ANALYSIS_TEMPLATE, SYSTEM_PROMPT } from '../prompt/prompts';
 import config from '../config';
 
+interface CacheItem {
+  data: string;
+  timestamp: number;
+}
+
 class AnalyzeService {
   private readonly API_KEY = config.API_KEY;
   private readonly API_URL = config.API_URL;
   private readonly API_TIMEOUT = config.API_TIMEOUT;
   private readonly TEMPERATURE = config.API_TEMPERATURE;
   private readonly MAX_TOKENS = config.API_MAX_TOKENS;
+  private readonly CACHE_DURATION = config.CACHE_DURATION;
+
+  private cache: Map<string, CacheItem> = new Map();
+
+  private getCacheKey(filename: string, data: LotteryData[]): string {
+    return `${filename}_${JSON.stringify(data)}`;
+  }
+
+  private isValidCache(cacheItem: CacheItem): boolean {
+    return Date.now() - cacheItem.timestamp < this.CACHE_DURATION;
+  }
 
   async analyzeLotteryData(filename: string): Promise<string> {
     try {
-      // Log the start of analysis
       console.log(`Starting lottery data analysis for file: ${filename}`);
 
       const workbook = XLSX.readFile(filename);
@@ -22,13 +37,21 @@ class AnalyzeService {
 
       console.log(`Successfully loaded ${data.length} records from Excel file`);
 
+      // 检查缓存
+      const cacheKey = this.getCacheKey(filename, data);
+      const cachedResult = this.cache.get(cacheKey);
+      if (cachedResult && this.isValidCache(cachedResult)) {
+        console.log('Returning cached analysis result');
+        return cachedResult.data;
+      }
+
       const prompt = this.buildAnalysisPrompt(data);
       console.log('Built analysis prompt, sending request to AI service...');
 
       const response = await axios.post(
         this.API_URL,
         {
-          model: 'qwen-plus',
+          model: 'qwen-turbo', // 使用更快的模型
           messages: [
             {
               role: 'system',
@@ -53,6 +76,13 @@ class AnalyzeService {
 
       console.log('Successfully received response from AI service');
       const rawContent = response.data.choices[0].message.content;
+
+      // 保存到缓存
+      this.cache.set(cacheKey, {
+        data: rawContent,
+        timestamp: Date.now(),
+      });
+
       return rawContent;
     } catch (error) {
       if (error instanceof AxiosError) {

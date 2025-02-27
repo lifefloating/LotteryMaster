@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
+import cors from '@fastify/cors';
 import config from './config'; // Import config
 
 import scraper from './services/scraper';
@@ -107,6 +108,13 @@ app.setErrorHandler((error: Error, request: FastifyRequest, reply: FastifyReply)
 // Start the server
 const start = async (): Promise<void> => {
   try {
+    // Register CORS plugin
+    await app.register(cors, {
+      origin: ['http://localhost:9000'], // Allow requests from your frontend
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
+    });
+
     await app.listen({ port: PORT, host: HOST });
     console.log(`Server running at http://localhost:${PORT}`);
     console.log('Available routes:');

@@ -18,11 +18,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/cors": "10.1.0",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
-    "@fastify/cors": "^8.0.0",
     "iconv-lite": "^0.6.3",
     "xlsx": "^0.18.5"
   },
