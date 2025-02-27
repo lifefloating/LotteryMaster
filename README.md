@@ -5,7 +5,7 @@
 
 - 📊 **数据处理**:  抓取彩票数据，保存到Excel文件。
 - 🤖 **输出报告**:  集成通义千问大模型(Qwen-MAX)，根据prompt生成分析报告，包括号码预测、号码推荐、号码趋势等。
-- 📱 **多端访问支持** (开发中):   计划支持Web、移动App等多平台访问，方便用户随时随地获取彩票分析信息。
+- 📱 **多端访问支持**:   支持Web、移动App等多平台访问，方便用户随时随地获取彩票分析信息。前端项目地址: [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp)
 
 ## 🛠️ 技术栈 (Tech Stack)
 
@@ -17,6 +17,10 @@
 
 - **AI 模型**
   - [通义千问 Qwen-MAX API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告。
+  
+- **前端开发**
+  - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
+
 ## 🚀 快速开始 (Quick Start)
 
 ### ⚙️ 环境要求 (Prerequisites)
@@ -56,9 +60,9 @@
 
    后端服务默认运行在 `http://localhost:3008`。
 
-5. **(可选) 运行前端项目**
+5. **运行前端项目**
 
-   如果前端项目已完成，请参考前端项目的 `README.md` 文件启动前端服务，并确保前端配置的后端API地址正确。
+   前端项目请参考 [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp) 的 `README.md` 文件启动前端服务，并确保前端配置的后端API地址正确。
 
 6. **docker运行**
 
