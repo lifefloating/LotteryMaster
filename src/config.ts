@@ -8,6 +8,7 @@ interface Config {
   DLT_URL: string;
   DATA_PATH: string;
   API_KEY: string;
+  API_MODEL: string;
   API_URL: string;
   API_TIMEOUT: number;
   API_TEMPERATURE: number;
@@ -24,6 +25,7 @@ const config: Config = {
   DLT_URL: process.env.DLT_URL as string,
   DATA_PATH: process.env.DATA_PATH ?? 'lottery_data',
   API_KEY: process.env.API_KEY as string,
+  API_MODEL: process.env.API_MODEL as string,
   API_URL: process.env.API_URL as string,
   API_TIMEOUT: parseInt(process.env.API_TIMEOUT ?? '30000', 10),
   API_TEMPERATURE: parseFloat(process.env.API_TEMPERATURE ?? '0.3'),

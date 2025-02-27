@@ -16,6 +16,7 @@ class AnalyzeService {
   private readonly TEMPERATURE = config.API_TEMPERATURE;
   private readonly MAX_TOKENS = config.API_MAX_TOKENS;
   private readonly CACHE_DURATION = config.CACHE_DURATION;
+  private readonly API_MODEL = config.API_MODEL;
 
   private cache: Map<string, CacheItem> = new Map();
 
@@ -51,7 +52,7 @@ class AnalyzeService {
       const response = await axios.post(
         this.API_URL,
         {
-          model: 'qwen-turbo', // 使用更快的模型
+          model: this.API_MODEL,
           messages: [
             {
               role: 'system',
