@@ -17,6 +17,7 @@ interface Config {
   SSQ_FILE_PREFIX: string;
   DLT_FILE_PREFIX: string;
   CACHE_DURATION: number;
+  CORS_ORIGINS: string[];
 }
 
 const config: Config = {
@@ -34,6 +35,7 @@ const config: Config = {
   SSQ_FILE_PREFIX: process.env.SSQ_FILE_PREFIX ?? 'ssq_data_',
   DLT_FILE_PREFIX: process.env.DLT_FILE_PREFIX ?? 'dlt_data_',
   CACHE_DURATION: parseInt(process.env.CACHE_DURATION ?? '3600000', 10),
+  CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['*'],
 };
 
 export default config;

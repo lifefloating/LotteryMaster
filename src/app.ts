@@ -110,7 +110,7 @@ const start = async (): Promise<void> => {
   try {
     // Register CORS plugin
     await app.register(cors, {
-      origin: ['http://localhost:9000'], // Allow requests from your frontend
+      origin: config.CORS_ORIGINS, // Use origins from config
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
     });
