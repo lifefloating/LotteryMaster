@@ -4,8 +4,9 @@ config();
 
 interface Config {
   PORT: number;
-  SSQ_URL: string;
-  DLT_URL: string;
+  SSQ_BASE_URL: string;
+  DLT_BASE_URL: string;
+  HISTORY_LIMIT: number;
   DATA_PATH: string;
   API_KEY: string;
   API_MODEL: string;
@@ -23,8 +24,9 @@ interface Config {
 
 const configDefault: Config = {
   PORT: parseInt(process.env.PORT ?? '3008', 10),
-  SSQ_URL: process.env.SSQ_URL as string,
-  DLT_URL: process.env.DLT_URL as string,
+  SSQ_BASE_URL: process.env.SSQ_BASE_URL as string,
+  DLT_BASE_URL: process.env.DLT_BASE_URL as string,
+  HISTORY_LIMIT: parseInt(process.env.HISTORY_LIMIT ?? '10000', 10),
   DATA_PATH: process.env.DATA_PATH ?? 'lottery_data',
   API_KEY: process.env.API_KEY as string,
   API_MODEL: process.env.API_MODEL as string,

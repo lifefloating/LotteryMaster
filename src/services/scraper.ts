@@ -10,8 +10,9 @@ import config from '../config'; // Import config
 const isValidNumber = (n: any): boolean => typeof n === 'number' && Number.isFinite(n);
 
 class LotteryScraper {
-  private readonly SSQ_URL = config.SSQ_URL;
-  private readonly DLT_URL = config.DLT_URL;
+  private readonly SSQ_BASE_URL = config.SSQ_BASE_URL;
+  private readonly DLT_BASE_URL = config.DLT_BASE_URL;
+  private readonly HISTORY_LIMIT = config.HISTORY_LIMIT;
   private readonly DATA_DIR = config.DATA_PATH;
   private readonly SSQ_PREFIX = config.SSQ_FILE_PREFIX;
   private readonly DLT_PREFIX = config.DLT_FILE_PREFIX;
@@ -32,6 +33,10 @@ class LotteryScraper {
     });
   }
 
+  private getFullUrl(baseUrl: string): string {
+    return `${baseUrl}?limit=${this.HISTORY_LIMIT}`;
+  }
+
   async scrapeSSQ(): Promise<ScrapeResult> {
     try {
       const today = new Date().toISOString().slice(0, 10);
@@ -49,10 +54,10 @@ class LotteryScraper {
         };
       }
 
-      const response = await axios.get(this.SSQ_URL, {
+      const response = await axios.get(this.getFullUrl(this.SSQ_BASE_URL), {
         responseType: 'arraybuffer',
       });
-      const decodedData = iconv.decode(response.data, 'gb2312'); // use iconv to decode GB2312 encoding
+      const decodedData = iconv.decode(response.data, 'gb2312');
       const $ = cheerio.load(decodedData);
       const data: LotteryData[] = [];
 
@@ -107,7 +112,7 @@ class LotteryScraper {
         };
       }
 
-      const response = await axios.get(this.DLT_URL);
+      const response = await axios.get(this.getFullUrl(this.DLT_BASE_URL));
       const $ = cheerio.load(response.data);
       const data: LotteryData[] = [];
 

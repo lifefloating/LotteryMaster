@@ -9,8 +9,8 @@ import longFileAnalyzeService from './services/longFileAnalyze';
 
 console.log('Environment variables loaded:', {
   PORT: config.PORT,
-  SSQ_URL: config.SSQ_URL,
-  DLT_URL: config.DLT_URL,
+  SSQ_BASE_URL: config.SSQ_BASE_URL,
+  DLT_BASE_URL: config.DLT_BASE_URL,
   DATA_PATH: config.DATA_PATH,
 });
 
