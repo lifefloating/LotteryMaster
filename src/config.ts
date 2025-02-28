@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
 
 interface Config {
   PORT: number;
@@ -21,7 +21,7 @@ interface Config {
   CORS_ORIGINS: string[];
 }
 
-const config: Config = {
+const configDefault: Config = {
   PORT: parseInt(process.env.PORT ?? '3008', 10),
   SSQ_URL: process.env.SSQ_URL as string,
   DLT_URL: process.env.DLT_URL as string,
@@ -40,4 +40,4 @@ const config: Config = {
   CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['*'],
 };
 
-export default config;
+export default configDefault;

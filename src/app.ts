@@ -1,14 +1,11 @@
-import dotenv from 'dotenv';
 import path from 'path';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
-import config from './config'; // Import config
+import config from './config'; // Import config already initializes dotenv
 
 import scraper from './services/scraper';
 import analyzeService from './services/analyze';
 import longFileAnalyzeService from './services/longFileAnalyze';
-
-dotenv.config();
 
 console.log('Environment variables loaded:', {
   PORT: config.PORT,
