@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/app.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "src/app.ts"
+    }
+  ],
+  "env": {
+    "PORT": "3008",
+    "API_KEY": "@api_key",
+    "API_MODEL": "qwen-turbo",
+    "API_MODEL_LONG": "qwen-long",
+    "API_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "API_TEMPERATURE": "0.2",
+    "API_MAX_TOKENS": "3000",
+    "API_TIMEOUT": "240000",
+    "CORS_ORIGINS": "*",
+    "HISTORY_LIMIT": "5000",
+    "SSQ_BASE_URL": "https://datachart.500.com/ssq/history/newinc/history.php",
+    "DLT_BASE_URL": "https://datachart.500.com/dlt/history/newinc/history.php",
+    "RECENT_DATA_COUNT": "1001",
+    "DATA_PATH": "lottery_data",
+    "CACHE_DURATION": "3600000"
+  }
+}
