@@ -63,17 +63,19 @@ class LotteryScraper {
 
       $('tr.t_tr1').each((_, element) => {
         const cells = $(element).find('td');
-        if (cells.length >= 8) {
-          const numbers = Array.from({ length: 6 }, (_, i) =>
-            parseInt(
-              $(cells[i + 1])
-                .text()
-                .trim()
-            )
-          );
-          const bonusNumber = parseInt($(cells[7]).text().trim());
-          const date = $(cells[0]).text().trim();
+        // Remove the length check to capture all rows with class t_tr1
+        const numbers = Array.from({ length: 6 }, (_, i) =>
+          parseInt(
+            $(cells[i + 1])
+              .text()
+              .trim()
+          )
+        );
+        const bonusNumber = parseInt($(cells[7]).text().trim());
+        const date = $(cells[0]).text().trim();
 
+        // Only add valid entries (where all numbers are parsed correctly)
+        if (date && !isNaN(bonusNumber) && numbers.every(num => !isNaN(num))) {
           data.push({
             date,
             numbers,
@@ -118,18 +120,20 @@ class LotteryScraper {
 
       $('tr.t_tr1').each((_, element) => {
         const cells = $(element).find('td');
-        if (cells.length >= 9) {
-          const numbers = Array.from({ length: 5 }, (_, i) =>
-            parseInt(
-              $(cells[i + 1])
-                .text()
-                .trim()
-            )
-          );
-          const bonusNumber = parseInt($(cells[6]).text().trim());
-          const bonusNumber2 = parseInt($(cells[7]).text().trim());
-          const date = $(cells[0]).text().trim();
+        // Remove the length check to capture all rows with class t_tr1
+        const numbers = Array.from({ length: 5 }, (_, i) =>
+          parseInt(
+            $(cells[i + 1])
+              .text()
+              .trim()
+          )
+        );
+        const bonusNumber = parseInt($(cells[6]).text().trim());
+        const bonusNumber2 = parseInt($(cells[7]).text().trim());
+        const date = $(cells[0]).text().trim();
 
+        // Only add valid entries (where all numbers are parsed correctly)
+        if (date && !isNaN(bonusNumber) && !isNaN(bonusNumber2) && numbers.every(num => !isNaN(num))) {
           data.push({
             date,
             numbers,
