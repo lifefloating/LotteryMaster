@@ -26,9 +26,6 @@ ENV NODE_ENV=production
 ENV PORT=3008
 EXPOSE $PORT
 
-# Install curl for healthcheck
-RUN apk add --no-cache curl
-
 RUN chown -R node:node /app
 USER node
 
