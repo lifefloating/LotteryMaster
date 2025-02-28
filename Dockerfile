@@ -32,7 +32,4 @@ RUN apk add --no-cache curl
 RUN chown -R node:node /app
 USER node
 
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:$PORT/api/health || exit 1
-
 CMD ["node", "dist/app.js"]
