@@ -11,7 +11,7 @@
 
 ### 1. 准备环境变量
 
-在项目根目录创建 `.env.production` 文件，参考 `.env.example` 配置必要的环境变量：
+在项目根目录创建 `.env` 文件，参考 `.env.example` 配置必要的环境变量：
 
 ```env
 # Server Configuration
@@ -41,7 +41,7 @@ docker build -t lottery-master .
 
 #### 方式一：使用环境变量文件
 
-如果您已经创建了 `.env.production` 文件，可以直接运行：
+如果您已经创建了 `.env` 文件，可以直接运行：
 
 ```bash
 docker run -d -p 3008:3008 --name lottery-master-app lottery-master
