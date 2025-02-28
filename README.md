@@ -64,14 +64,21 @@
 
    前端项目请参考 [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp) 的 `README.md` 文件启动前端服务，并确保前端配置的后端API地址正确。
 
-6. **docker运行**
+6. **部署&运行 (Deployment & Running)**
 
+   ### Docker部署
+
+   #### 前提条件
+   - 已安装 [Docker](https://www.docker.com/get-started)
+   - 已克隆 LotteryMaster 代码仓库
+
+   #### 运行步骤
+   1. 使用环境变量文件运行Docker容器：
    ```bash
-   docker build -t lottery-master .
-   docker run -d -p 3008:3008 --env PORT=3008 --env API_KEY=your_api_key lottery-master
+   docker run -d -p 3008:3008 --name lottery-master-app lottery-master
    ```
 
-   请替换 `your_api_key` 为您的 API 密钥。
+   更多详细的部署说明请参考：[部署指南](./DEPLOYMENT.md)
 
 
 ### 🔗 访问API

@@ -1,5 +1,5 @@
 # Stage 1: Build environment
-FROM node:22.11.0-alpine AS builder
+FROM node:20.11.0-alpine AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . .
 RUN pnpm run build
 
 # Stage 2: Production image
-FROM node:22.11.0-alpine
+FROM node:20.11.0-alpine
 
 WORKDIR /app
 
@@ -25,6 +25,9 @@ COPY --from=builder /app/.env.production ./.env
 ENV NODE_ENV=production
 ENV PORT=3008
 EXPOSE $PORT
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
 
 RUN chown -R node:node /app
 USER node
