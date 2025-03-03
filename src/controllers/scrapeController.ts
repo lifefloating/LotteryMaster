@@ -1,0 +1,26 @@
+import { FastifyRequest, FastifyReply } from 'fastify';
+import scraper from '../services/scraperService';
+
+export const scrapeSSQ = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> => {
+  const result = await scraper.scrapeSSQ();
+  return reply.send({
+    success: result.success,
+    message: result.message,
+    isNewFile: result.isNewFile,
+  });
+};
+
+export const scrapeDLT = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> => {
+  const result = await scraper.scrapeDLT();
+  return reply.send({
+    success: result.success,
+    message: result.message,
+    isNewFile: result.isNewFile,
+  });
+};
