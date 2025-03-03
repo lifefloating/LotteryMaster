@@ -2,10 +2,11 @@ import path from 'path';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import config from './config'; // Import config already initializes dotenv
+import * as XLSX from 'xlsx';
 
-import scraper from './services/scraper';
-import analyzeService from './services/analyze';
-import longFileAnalyzeService from './services/longFileAnalyze';
+import scraper from './services/scraperService';
+import analyzeService from './services/analyzeService';
+import chartService from './services/chartService';
 
 console.log('Environment variables loaded:', {
   PORT: config.PORT,
@@ -71,30 +72,187 @@ app.get('/api/analyze/dlt', async () => {
   };
 });
 
-app.get('/api/analyze/ssq/long', async () => {
-  const today = new Date().toISOString().slice(0, 10);
-  const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
-  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName, 'SSQ');
-  return {
-    success: true,
-    analysis: {
-      raw: analysis.rawContent,
-      structured: analysis.structured,
-    },
+// Chart trend analysis endpoints
+app.get<{
+  Querystring: {
+    type: 'ssq' | 'dlt';
+    periodCount?: string;
+    zoneType?: 'red' | 'blue';
+    includeChartData?: string;
   };
+}>('/api/chart/trend', async (request, reply) => {
+  try {
+    const {
+      type,
+      periodCount = '100',
+      zoneType = 'red',
+      includeChartData = 'true',
+    } = request.query;
+    const lotteryType = type.toUpperCase() as 'SSQ' | 'DLT';
+    const periods = parseInt(periodCount, 10);
+
+    if (isNaN(periods) || periods <= 0) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(DATA_PATH, `${type}_data_${today}.xlsx`);
+
+    const result = await chartService.generateNumberTrend(fileName, lotteryType, periods, zoneType);
+
+    // 如果不需要chartData，则从响应中移除
+    if (includeChartData === 'false') {
+      const resultCopy = { ...result };
+      if ('chartData' in resultCopy) {
+        delete resultCopy.chartData;
+      }
+      return {
+        success: true,
+        data: resultCopy,
+      };
+    }
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    app.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      error: {
+        message: (error as Error).message,
+      },
+    });
+  }
 });
 
-app.get('/api/analyze/dlt/long', async () => {
-  const today = new Date().toISOString().slice(0, 10);
-  const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
-  const analysis = await longFileAnalyzeService.analyzeLotteryData(fileName, 'DLT');
-  return {
-    success: true,
-    analysis: {
-      raw: analysis.rawContent,
-      structured: analysis.structured,
-    },
+// Number frequency chart endpoint
+app.get<{
+  Querystring: {
+    type: 'ssq' | 'dlt';
+    periodCount?: string;
+    zoneType?: 'red' | 'blue';
+    includeChartData?: string;
   };
+}>('/api/chart/frequency', async (request, reply) => {
+  try {
+    const {
+      type,
+      periodCount = '100',
+      zoneType = 'red',
+      includeChartData = 'true',
+    } = request.query;
+    const lotteryType = type.toUpperCase() as 'SSQ' | 'DLT';
+    const periods = parseInt(periodCount, 10);
+
+    if (isNaN(periods) || periods <= 0) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(DATA_PATH, `${type}_data_${today}.xlsx`);
+
+    // Only generate chart data if needed
+    if (includeChartData === 'false') {
+      // For frequency chart, we don't have a separate statistics object
+      // So we'll return an empty result if chart data is not needed
+      return {
+        success: true,
+        data: { message: 'Chart data excluded as requested' },
+      };
+    }
+
+    const chartData = await chartService.generateFrequencyChart(
+      fileName,
+      lotteryType,
+      periods,
+      zoneType
+    );
+
+    return {
+      success: true,
+      data: chartData,
+    };
+  } catch (error) {
+    app.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      error: {
+        message: (error as Error).message,
+      },
+    });
+  }
+});
+
+// Add a temporary test route to examine Excel file structure
+app.get('/api/test/excel', async (request, reply) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(DATA_PATH, `dlt_data_${today}.xlsx`);
+
+    // Read Excel file
+    const workbook = XLSX.readFile(fileName);
+    const sheetName = workbook.SheetNames[0];
+    const rawData = XLSX.utils.sheet_to_json<any>(workbook.Sheets[sheetName]);
+
+    // Get first 5 rows for inspection
+    const sampleData = rawData.slice(0, 5);
+
+    return {
+      success: true,
+      data: {
+        sampleRows: sampleData,
+        columnNames: sampleData.length > 0 ? Object.keys(sampleData[0]) : [],
+      },
+    };
+  } catch (error) {
+    app.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      error: {
+        message: (error as Error).message,
+      },
+    });
+  }
+});
+
+// Add a temporary test route to examine SSQ Excel file structure
+app.get('/api/test/excel/ssq', async (request, reply) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(DATA_PATH, `ssq_data_${today}.xlsx`);
+
+    // Read Excel file
+    const workbook = XLSX.readFile(fileName);
+    const sheetName = workbook.SheetNames[0];
+    const rawData = XLSX.utils.sheet_to_json<any>(workbook.Sheets[sheetName]);
+
+    // Get first 5 rows for inspection
+    const sampleData = rawData.slice(0, 5);
+
+    return {
+      success: true,
+      data: {
+        sampleRows: sampleData,
+        columnNames: sampleData.length > 0 ? Object.keys(sampleData[0]) : [],
+      },
+    };
+  } catch (error) {
+    app.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      error: {
+        message: (error as Error).message,
+      },
+    });
+  }
 });
 
 // Add global uncaught exception handlers
@@ -158,8 +316,16 @@ const start = async (): Promise<void> => {
     console.log('- GET /api/scrape/dlt');
     console.log('- GET /api/analyze/ssq');
     console.log('- GET /api/analyze/dlt');
-    console.log('- GET /api/analyze/ssq/qwen');
-    console.log('- GET /api/analyze/dlt/qwen');
+    console.log('- GET /api/analyze/ssq/long');
+    console.log('- GET /api/analyze/dlt/long');
+    console.log(
+      '- GET /api/chart/trend?type=[ssq|dlt]&periodCount=[30|50|100]&zoneType=[red|blue]'
+    );
+    console.log(
+      '- GET /api/chart/frequency?type=[ssq|dlt]&periodCount=[30|50|100]&zoneType=[red|blue]'
+    );
+    console.log('- GET /api/test/excel');
+    console.log('- GET /api/test/excel/ssq');
   } catch (err) {
     app.log.error(err);
     process.exit(1);

@@ -75,7 +75,7 @@ class LotteryScraper {
         const date = $(cells[0]).text().trim();
 
         // Only add valid entries (where all numbers are parsed correctly)
-        if (date && !isNaN(bonusNumber) && numbers.every(num => !isNaN(num))) {
+        if (date && !isNaN(bonusNumber) && numbers.every((num) => !isNaN(num))) {
           data.push({
             date,
             numbers,
@@ -133,7 +133,12 @@ class LotteryScraper {
         const date = $(cells[0]).text().trim();
 
         // Only add valid entries (where all numbers are parsed correctly)
-        if (date && !isNaN(bonusNumber) && !isNaN(bonusNumber2) && numbers.every(num => !isNaN(num))) {
+        if (
+          date &&
+          !isNaN(bonusNumber) &&
+          !isNaN(bonusNumber2) &&
+          numbers.every((num) => !isNaN(num))
+        ) {
           data.push({
             date,
             numbers,
