@@ -6,7 +6,9 @@ import iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config'; // Import config
+import { createLogger } from '../utils/logger';
 
+const logger = createLogger('scraperService');
 const isValidNumber = (n: any): boolean => typeof n === 'number' && Number.isFinite(n);
 
 class LotteryScraper {
@@ -92,8 +94,12 @@ class LotteryScraper {
         isNewFile: true,
       };
     } catch (error) {
-      console.error('Error scraping SSQ data:', error);
-      throw error;
+      logger.error('Error scraping SSQ data:', error);
+      return {
+        success: false,
+        message: `Failed to scrape SSQ data: ${error instanceof Error ? error.message : String(error)}`,
+        isNewFile: false,
+      };
     }
   }
 
@@ -156,8 +162,12 @@ class LotteryScraper {
         isNewFile: true,
       };
     } catch (error) {
-      console.error('Error scraping DLT data:', error);
-      throw error;
+      logger.error('Error scraping DLT data:', error);
+      return {
+        success: false,
+        message: `Failed to scrape DLT data: ${error instanceof Error ? error.message : String(error)}`,
+        isNewFile: false,
+      };
     }
   }
 

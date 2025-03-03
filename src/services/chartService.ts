@@ -1,5 +1,11 @@
 import * as XLSX from 'xlsx';
+import * as fs from 'fs';
+import * as path from 'path';
+import config from '../config';
+import { createLogger } from '../utils/logger';
 import { LotteryData } from '../types/lottery';
+
+const logger = createLogger('chartService');
 
 // Define interfaces for trend analysis
 export interface NumberTrendPoint {
@@ -56,9 +62,6 @@ class ChartService {
       const sheetName = workbook.SheetNames[0];
       const allData = XLSX.utils.sheet_to_json<any>(workbook.Sheets[sheetName]);
 
-      console.log(`Processing ${type} data, first row keys:`, Object.keys(allData[0]));
-      console.log(`First row sample:`, JSON.stringify(allData[0], null, 2));
-
       // Special handling for SSQ data
       if (type === 'SSQ') {
         // Check if we have the expected column names
@@ -66,20 +69,9 @@ class ChartService {
         const hasRedColumn = Object.hasOwn(firstRow, '红球');
         const hasBlueColumn = Object.hasOwn(firstRow, '蓝球');
 
-        console.log(`SSQ data format check - Has '红球' column: ${hasRedColumn}`);
-        console.log(`SSQ data format check - Has '蓝球' column: ${hasBlueColumn}`);
-
         // If we don't have the expected columns, try to determine the actual column names
         if (!hasRedColumn || !hasBlueColumn) {
-          console.log(
-            `SSQ data has unexpected column structure. Available columns:`,
-            Object.keys(firstRow)
-          );
-
-          // For debugging, print the first few rows
-          for (let i = 0; i < Math.min(3, allData.length); i++) {
-            console.log(`Row ${i + 1} data:`, JSON.stringify(allData[i], null, 2));
-          }
+          // For debugging, print the first few rows - removed these logs
         }
       }
 
@@ -116,7 +108,6 @@ class ChartService {
                 // If we have 6 numbers, it's likely the red balls
                 if (numbers.length === 6 && numbers.every((n) => !isNaN(n))) {
                   frontNumbers = numbers;
-                  console.log(`Found red balls in column '${key}': ${frontNumbers}`);
                   break;
                 }
               }
@@ -145,7 +136,6 @@ class ChartService {
                 const num = parseInt(value.toString(), 10);
                 if (!isNaN(num) && num >= 1 && num <= 16) {
                   backNumber1 = num;
-                  console.log(`Found blue ball in column '${key}': ${backNumber1}`);
                   break;
                 }
               }
@@ -175,19 +165,12 @@ class ChartService {
         });
       }
 
-      // Log the first converted item to verify
-      console.log(`Converted lottery data (first item):`, JSON.stringify(lotteryData[0], null, 2));
-      console.log(`Converted lottery data (second item):`, JSON.stringify(lotteryData[1], null, 2));
-
       // For blue zone, check if we have any bonus numbers
       if (zoneType === 'blue') {
         let blueBallCount = 0;
         lotteryData.forEach((item) => {
           if (item.bonusNumber !== undefined) blueBallCount++;
         });
-        console.log(
-          `Total blue balls found in converted data: ${blueBallCount} out of ${lotteryData.length} records`
-        );
       }
 
       // Get the most recent n periods
@@ -201,11 +184,6 @@ class ChartService {
 
       // Process data to generate trend points
       const trendData = this.processTrendData(data, numberRange, zoneType, numberStats, type);
-
-      // Log statistics for debugging
-      if (zoneType === 'blue') {
-        console.log(`Blue ball stats for numbers 1-5:`, Object.values(numberStats).slice(0, 5));
-      }
 
       return {
         chartData: {
@@ -244,7 +222,7 @@ class ChartService {
         },
       };
     } catch (error) {
-      console.error('Error generating chart data:', error);
+      logger.error('Error generating chart data:', error);
       throw new Error(`Failed to generate chart data: ${(error as Error).message}`);
     }
   }
@@ -299,22 +277,6 @@ class ChartService {
     const intervals: Record<number, number[]> = {};
     const lastAppearance: Record<number, number> = {};
 
-    // Log data for debugging
-    console.log(`Processing ${data.length} lottery records for ${zoneType} zone`);
-    if (data.length > 0) {
-      console.log(`First record sample:`, JSON.stringify(data[0], null, 2));
-    }
-
-    // Count blue balls for verification
-    if (zoneType === 'blue') {
-      let blueBallCount = 0;
-      data.forEach((draw) => {
-        if (draw.bonusNumber !== undefined) blueBallCount++;
-        if (draw.bonusNumber2 !== undefined) blueBallCount++;
-      });
-      console.log(`Total blue balls found: ${blueBallCount}`);
-    }
-
     // Initialize intervals tracking
     for (let num = range.min; num <= range.max; num++) {
       intervals[num] = [];
@@ -327,18 +289,11 @@ class ChartService {
 
       // For blue balls, include the bonus numbers
       if (zoneType === 'blue') {
-        console.log(
-          `Processing blue balls for record ${index + 1}, lottery type: ${type || 'unknown'}`
-        );
         if (draw.bonusNumber !== undefined) {
           numbers.push(draw.bonusNumber);
-          console.log(`  Added blue ball: ${draw.bonusNumber}`);
-        } else {
-          console.log(`  No blue ball found for record ${index + 1}`);
         }
         if (draw.bonusNumber2 !== undefined) {
           numbers.push(draw.bonusNumber2);
-          console.log(`  Added second blue ball: ${draw.bonusNumber2}`);
         }
       }
 
@@ -580,7 +535,7 @@ class ChartService {
         },
       };
     } catch (error) {
-      console.error('Error generating frequency chart data:', error);
+      logger.error('Error generating frequency chart data:', error);
       throw new Error(`Failed to generate frequency chart data: ${(error as Error).message}`);
     }
   }

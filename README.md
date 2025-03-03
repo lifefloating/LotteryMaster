@@ -12,7 +12,8 @@
 - **后端开发**
   - <a href="https://www.fastify.io/"><img src="https://img.shields.io/badge/Fastify-404D59?style=flat-square&logo=fastify&logoColor=white" alt="Fastify Badge"/></a> 
 <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js Badge"/></a> 
-<a href="https://cheerio.js.org/"><img src="https://img.shields.io/badge/Cheerio.js-00A300?style=flat-square&logo=css3&logoColor=white" alt="Cheerio.js Badge"/></a> 
+<a href="https://cheerio.js.org/"><img src="https://img.shields.io/badge/Cheerio.js-orange?style=flat-square&logo=css3&logoColor=white" alt="Cheerio.js Badge"/></a> 
+<a href="https://getpino.io/"><img src="https://img.shields.io/badge/Pino-green?style=flat-square&logo=npm&logoColor=white" alt="Pino Badge"/></a>
 <a href="https://www.npmjs.com/package/xlsx"><img src="https://img.shields.io/badge/xlsx-lightgrey?style=flat-square&logo=npm&logoColor=red" alt="xlsx Badge"/></a>
 
 - **AI 模型**

@@ -3,12 +3,13 @@ import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import config from './config'; // Import config already initializes dotenv
 import * as XLSX from 'xlsx';
+import logger from './utils/logger';
 
 import scraper from './services/scraperService';
 import analyzeService from './services/analyzeService';
 import chartService from './services/chartService';
 
-console.log('Environment variables loaded:', {
+logger.info('Environment variables loaded:', {
   PORT: config.PORT,
   SSQ_BASE_URL: config.SSQ_BASE_URL,
   DLT_BASE_URL: config.DLT_BASE_URL,
@@ -310,22 +311,22 @@ const start = async (): Promise<void> => {
     });
 
     await app.listen({ port: PORT, host: HOST });
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log('Available routes:');
-    console.log('- GET /api/scrape/ssq');
-    console.log('- GET /api/scrape/dlt');
-    console.log('- GET /api/analyze/ssq');
-    console.log('- GET /api/analyze/dlt');
-    console.log('- GET /api/analyze/ssq/long');
-    console.log('- GET /api/analyze/dlt/long');
-    console.log(
-      '- GET /api/chart/trend?type=[ssq|dlt]&periodCount=[30|50|100]&zoneType=[red|blue]'
+    logger.info(`Server running at http://localhost:${PORT}`);
+    logger.info('Available routes:');
+    logger.info('- GET /api/scrape/ssq');
+    logger.info('- GET /api/scrape/dlt');
+    logger.info('- GET /api/analyze/ssq');
+    logger.info('- GET /api/analyze/dlt');
+    logger.info('- GET /api/analyze/ssq/long');
+    logger.info('- GET /api/analyze/dlt/long');
+    logger.info(
+      '- GET /api/chart/ssq/frequency?type=red|blue&limit=10&format=json|html'
     );
-    console.log(
-      '- GET /api/chart/frequency?type=[ssq|dlt]&periodCount=[30|50|100]&zoneType=[red|blue]'
+    logger.info(
+      '- GET /api/chart/dlt/frequency?type=red|blue&limit=10&format=json|html'
     );
-    console.log('- GET /api/test/excel');
-    console.log('- GET /api/test/excel/ssq');
+    logger.info('- GET /api/test/excel');
+    logger.info('- GET /api/test/excel/ssq');
   } catch (err) {
     app.log.error(err);
     process.exit(1);

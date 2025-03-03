@@ -4,6 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
 import { STRUCTURED_ANALYSIS_TEMPLATE, STRUCTURED_SYSTEM_PROMPT } from '../prompt/prompts';
 import config from '../config';
+import * as fs from 'fs';
+import * as path from 'path';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('analyzeService');
 
 interface CacheItem {
   data: AnalysisResult;
@@ -32,24 +37,24 @@ class AnalyzeService {
 
   async analyzeLotteryData(filename: string, type: 'SSQ' | 'DLT'): Promise<AnalysisResult> {
     try {
-      console.log(`Starting lottery data analysis for file: ${filename}`);
+      logger.info(`Starting lottery data analysis for file: ${filename}`);
 
       const workbook = XLSX.readFile(filename);
       const sheetName = workbook.SheetNames[0];
       const data = XLSX.utils.sheet_to_json<LotteryData>(workbook.Sheets[sheetName]);
 
-      console.log(`Successfully loaded ${data.length} records from Excel file`);
+      logger.info(`Successfully loaded ${data.length} records from Excel file`);
 
       // 检查缓存
       const cacheKey = this.getCacheKey(filename, data);
       const cachedResult = this.cache.get(cacheKey);
       if (cachedResult && this.isValidCache(cachedResult)) {
-        console.log('Returning cached analysis result');
+        logger.info('Returning cached analysis result');
         return cachedResult.data;
       }
 
       const prompt = this.buildStructuredAnalysisPrompt(data);
-      console.log('Built structured analysis prompt, sending request to AI service...');
+      logger.info('Built structured analysis prompt, sending request to AI service...');
 
       const response = await axios.post(
         this.API_URL,
@@ -78,7 +83,7 @@ class AnalyzeService {
         }
       );
 
-      console.log('Successfully received response from AI service');
+      logger.info('Successfully received response from AI service');
 
       // 验证响应数据的完整性
       if (!response.data) {
@@ -86,19 +91,19 @@ class AnalyzeService {
       }
 
       if (!response.data.choices?.[0]?.message?.content) {
-        console.error('Invalid API response structure:', response.data);
+        logger.error('Invalid API response structure:', response.data);
         throw new Error('Invalid response structure from AI service');
       }
 
       const rawContent = response.data.choices[0].message.content;
-      console.log('Raw content from AI service:', rawContent.substring(0, 100) + '...');
+      logger.info('Raw content from AI service:', rawContent.substring(0, 100) + '...');
 
       // 解析结构化数据和Markdown
       const result = this.parseStructuredResponse(rawContent);
 
       // 验证解析结果
       if (!result.structured || Object.keys(result.structured).length === 0) {
-        console.error('Failed to parse structured data from AI response');
+        logger.error('Failed to parse structured data from AI response');
         throw new Error('Failed to parse AI response into structured format');
       }
 
@@ -112,7 +117,7 @@ class AnalyzeService {
       return result;
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('API Request Error:', {
+        logger.error('API Request Error:', {
           status: error.response?.status,
           statusText: error.response?.statusText,
           data: error.response?.data,
@@ -122,14 +127,14 @@ class AnalyzeService {
         });
         throw new Error(`API Request failed: ${error.message} (Status: ${error.response?.status})`);
       } else if (error instanceof Error) {
-        console.error('Error analyzing lottery data:', {
+        logger.error('Error analyzing lottery data:', {
           name: error.name,
           message: error.message,
           stack: error.stack,
         });
         throw error;
       } else {
-        console.error('Unknown error:', error);
+        logger.error('Unknown error:', error);
         throw new Error('Unknown error occurred during analysis');
       }
     }
@@ -166,7 +171,7 @@ class AnalyzeService {
     };
 
     try {
-      console.log('Parsing structured response from AI');
+      logger.info('Parsing structured response from AI');
 
       // 提取JSON部分
       const jsonRegex = /```json\s*([\s\S]*?)\s*```/;
@@ -179,13 +184,13 @@ class AnalyzeService {
             structured: jsonData,
           };
         } catch (jsonError) {
-          console.error('Error parsing JSON from AI response:', jsonError);
+          logger.error('Error parsing JSON from AI response:', jsonError);
         }
       }
 
       return defaultResult;
     } catch (error) {
-      console.error('Error parsing structured response:', error);
+      logger.error('Error parsing structured response:', error);
       return defaultResult;
     }
   }
@@ -195,11 +200,11 @@ class AnalyzeService {
     try {
       const recentCount = config.RECENT_DATA_COUNT;
       const recentData = data.slice(0, recentCount);
-      console.log(`Building structured prompt with ${recentData.length} recent records`);
+      logger.info(`Building structured prompt with ${recentData.length} recent records`);
 
       return STRUCTURED_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
     } catch (error) {
-      console.error('Error building structured analysis prompt:', {
+      logger.error('Error building structured analysis prompt:', {
         error,
         dataLength: data?.length,
       });
