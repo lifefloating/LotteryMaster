@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { createLogger } from '../utils/logger';
 import { LotteryData } from '../types/lottery';
+import * as fs from 'fs';
 
 const logger = createLogger('chartService');
 
@@ -54,6 +55,12 @@ class ChartService {
     zoneType: 'red' | 'blue' = 'red'
   ): Promise<TrendAnalysisResult> {
     try {
+      // Check if file exists
+      if (!fs.existsSync(filename)) {
+        logger.error(`File not found: ${filename}`);
+        throw new Error(`文件不存在: ${filename}`);
+      }
+
       // Read Excel file and convert to lottery data
       const lotteryData = this.extractLotteryDataFromExcel(filename, type);
 
@@ -385,6 +392,12 @@ class ChartService {
     zoneType: 'red' | 'blue' = 'red'
   ): Promise<ChartData> {
     try {
+      // Check if file exists
+      if (!fs.existsSync(filename)) {
+        logger.error(`File not found: ${filename}`);
+        throw new Error(`文件不存在: ${filename}`);
+      }
+
       // Extract lottery data from Excel
       const lotteryData = this.extractLotteryDataForFrequency(filename, type);
 
