@@ -1,7 +1,4 @@
 import * as XLSX from 'xlsx';
-import * as fs from 'fs';
-import * as path from 'path';
-import config from '../config';
 import { createLogger } from '../utils/logger';
 import { LotteryData } from '../types/lottery';
 
@@ -165,14 +162,6 @@ class ChartService {
         });
       }
 
-      // For blue zone, check if we have any bonus numbers
-      if (zoneType === 'blue') {
-        let blueBallCount = 0;
-        lotteryData.forEach((item) => {
-          if (item.bonusNumber !== undefined) blueBallCount++;
-        });
-      }
-
       // Get the most recent n periods
       const data = lotteryData.slice(-periodCount);
 
@@ -271,7 +260,7 @@ class ChartService {
     range: { min: number; max: number },
     zoneType: 'red' | 'blue',
     stats: Record<number, any>,
-    type?: 'SSQ' | 'DLT'
+    type: 'SSQ' | 'DLT'
   ): NumberTrendPoint[] {
     const trendPoints: NumberTrendPoint[] = [];
     const intervals: Record<number, number[]> = {};
@@ -292,7 +281,8 @@ class ChartService {
         if (draw.bonusNumber !== undefined) {
           numbers.push(draw.bonusNumber);
         }
-        if (draw.bonusNumber2 !== undefined) {
+        // Only include the second blue ball for DLT type
+        if (type === 'DLT' && draw.bonusNumber2 !== undefined) {
           numbers.push(draw.bonusNumber2);
         }
       }
@@ -482,7 +472,8 @@ class ChartService {
           if (draw.bonusNumber !== undefined) {
             numbers.push(draw.bonusNumber);
           }
-          if (draw.bonusNumber2 !== undefined) {
+          // Only include the second blue ball for DLT type
+          if (type === 'DLT' && draw.bonusNumber2 !== undefined) {
             numbers.push(draw.bonusNumber2);
           }
         }

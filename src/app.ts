@@ -319,12 +319,8 @@ const start = async (): Promise<void> => {
     logger.info('- GET /api/analyze/dlt');
     logger.info('- GET /api/analyze/ssq/long');
     logger.info('- GET /api/analyze/dlt/long');
-    logger.info(
-      '- GET /api/chart/ssq/frequency?type=red|blue&limit=10&format=json|html'
-    );
-    logger.info(
-      '- GET /api/chart/dlt/frequency?type=red|blue&limit=10&format=json|html'
-    );
+    logger.info('- GET /api/chart/ssq/frequency?type=red|blue&limit=10&format=json|html');
+    logger.info('- GET /api/chart/dlt/frequency?type=red|blue&limit=10&format=json|html');
     logger.info('- GET /api/test/excel');
     logger.info('- GET /api/test/excel/ssq');
   } catch (err) {

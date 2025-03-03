@@ -4,8 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
 import { STRUCTURED_ANALYSIS_TEMPLATE, STRUCTURED_SYSTEM_PROMPT } from '../prompt/prompts';
 import config from '../config';
-import * as fs from 'fs';
-import * as path from 'path';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('analyzeService');
