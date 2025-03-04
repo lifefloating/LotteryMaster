@@ -25,7 +25,7 @@
     "HISTORY_LIMIT": "5000",
     "SSQ_BASE_URL": "https://datachart.500.com/ssq/history/newinc/history.php",
     "DLT_BASE_URL": "https://datachart.500.com/dlt/history/newinc/history.php",
-    "RECENT_DATA_COUNT": "1001",
+    "RECENT_DATA_COUNT": "5000",
     "DATA_PATH": "lottery_data",
     "CACHE_DURATION": "3600000"
   }
