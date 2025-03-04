@@ -4,6 +4,8 @@ config();
 
 interface Config {
   PORT: number;
+  NODE_ENV: string;
+  LOG_LEVEL: string;
   SSQ_BASE_URL: string;
   DLT_BASE_URL: string;
   HISTORY_LIMIT: number;
@@ -24,6 +26,8 @@ interface Config {
 
 const configDefault: Config = {
   PORT: parseInt(process.env.PORT ?? '3008', 10),
+  NODE_ENV: process.env.NODE_ENV ?? 'development',
+  LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
   SSQ_BASE_URL: process.env.SSQ_BASE_URL as string,
   DLT_BASE_URL: process.env.DLT_BASE_URL as string,
   HISTORY_LIMIT: parseInt(process.env.HISTORY_LIMIT ?? '10000', 10),

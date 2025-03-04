@@ -1,6 +1,7 @@
-import pino from 'pino';
+import pino, { Logger, LoggerOptions } from 'pino';
+import config from '../config';
 
-// Define log levels
+// 日志级别
 export enum LogLevel {
   TRACE = 'trace',
   DEBUG = 'debug',
@@ -10,27 +11,59 @@ export enum LogLevel {
   FATAL = 'fatal',
 }
 
-// Configure the logger
-const logger = pino({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  transport:
-    process.env.NODE_ENV === 'test'
-      ? undefined
-      : process.env.NODE_ENV === 'production'
-        ? undefined
-        : {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              ignore: 'pid,hostname',
-            },
-          },
-});
+// 设置某个级别后，只有该级别及更高级别的日志会被记录
+const getLogLevel = (): LogLevel => {
+  // 确保 LOG_LEVEL 存在且不为空
+  if (config.LOG_LEVEL) {
+    const configLogLevel = config.LOG_LEVEL.toLowerCase() as LogLevel;
+    if (Object.values(LogLevel).includes(configLogLevel)) {
+      return configLogLevel;
+    }
+  }
 
-// Create a logger instance for each module
-export const createLogger = (moduleName: string): any => {
-  return logger.child({ module: moduleName });
+  // 默认值基于环境
+  return config.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG;
 };
 
-// Default logger
-export default logger;
+// 创建日志选项
+const getLoggerOptions = (): LoggerOptions => {
+  // 基本配置
+  const baseOptions: LoggerOptions = {
+    level: getLogLevel(),
+  };
+
+  // 测试环境使用最简单的配置
+  if (config.NODE_ENV === 'test') {
+    return {
+      ...baseOptions,
+      enabled: true,
+    };
+  }
+
+  // 开发环境使用美化输出
+  if (config.NODE_ENV === 'development') {
+    return {
+      ...baseOptions,
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          ignore: 'pid,hostname',
+          translateTime: 'SYS:standard',
+        },
+      },
+    };
+  }
+
+  // 生产环境使用基本配置
+  return baseOptions;
+};
+
+const rootLogger: Logger = pino(getLoggerOptions());
+
+export const createLogger = (moduleName: string): Logger => {
+  return rootLogger.child({ module: moduleName });
+};
+
+// 导出默认日志实例
+export default rootLogger;
