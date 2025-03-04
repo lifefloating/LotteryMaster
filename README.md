@@ -24,16 +24,16 @@
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
 
 - **测试覆盖率**
-- <a href="#"><img src="https://img.shields.io/badge/Coverage-53.93%25-yellow" alt="Coverage Badge"/></a>
+- <a href="#"><img src="https://img.shields.io/badge/Coverage-85.87%25-green" alt="Coverage Badge"/></a>
 
   **总体覆盖率指标**
 
   | 指标 | 覆盖率 |
   |------|--------|
-  | (Statements) | 53.93% |
-  | (Branches) | 42.94% |
-  | (Functions) | 42.37% |
-  | (Lines) | 54.43% |
+  | (Statements) | 85.87% |
+  | (Branches) | 79.14% |
+  | (Functions) | 89.83% |
+  | (Lines) | 85.46% |
 
   **说明**
   - 后续补全单测
@@ -141,4 +141,3 @@ pnpm test:coverage
   <a href="#"><img src="https://img.shields.io/badge/Status-Beta-yellow" alt="Project Status: Beta"/></a>
   <a href="#"><img src="https://img.shields.io/badge/License-MIT-brightgreen" alt="License: MIT"/></a>
 </p>
-
