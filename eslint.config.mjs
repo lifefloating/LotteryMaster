@@ -3,12 +3,24 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import typescript from '@typescript-eslint/parser';
 import prettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
+import globals from 'globals';
 
 export default [
   {
     ignores: ['dist/**/*', 'node_modules/**/*', 'dev/**/*']
   },
   eslint.configs.recommended,
+  {
+    files: ['jest.config.ts'],
+    languageOptions: {
+      parser: typescript,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      }
+    }
+  },
   {
     files: ['src/**/*.ts'],
     languageOptions: {
@@ -18,26 +30,14 @@ export default [
         sourceType: 'module'
       },
       globals: {
-        console: true,
-        process: true,
-        module: true,
-        require: true,
-        exports: true,
-        __dirname: true,
-        __filename: true,
-        Buffer: true,
-        setTimeout: true,
-        clearTimeout: true,
-        setInterval: true,
-        clearInterval: true,
-        setImmediate: true,
-        clearImmediate: true,
-        global: true
+        ...globals.node,
+        ...globals.jest,
       }
     },
     plugins: {
       '@typescript-eslint': tseslint,
-      'prettier': prettier
+      'prettier': prettier,
+      'eslint-plugin-unused-imports': unusedImports,
     },
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'warn',

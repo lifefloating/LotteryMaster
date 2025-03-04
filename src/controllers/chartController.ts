@@ -3,8 +3,6 @@ import path from 'path';
 import config from '../config';
 import chartService from '../services/chartService';
 
-const DATA_PATH = config.DATA_PATH;
-
 interface ChartQuerystring {
   type: 'ssq' | 'dlt';
   periodCount?: string;
@@ -34,18 +32,16 @@ export const getTrendChart = async (
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(DATA_PATH, `${type}_data_${today}.xlsx`);
+    const fileName = path.join(config.DATA_PATH, `${type}_data_${today}.xlsx`);
 
     const result = await chartService.generateNumberTrend(fileName, lotteryType, periods, zoneType);
 
     if (includeChartData === 'false') {
-      const resultCopy = { ...result };
-      if ('chartData' in resultCopy) {
-        delete resultCopy.chartData;
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { chartData, ...rest } = result;
       return reply.send({
         success: true,
-        data: resultCopy,
+        data: rest,
       });
     }
 
@@ -84,15 +80,15 @@ export const getFrequencyChart = async (
       });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(DATA_PATH, `${type}_data_${today}.xlsx`);
-
     if (includeChartData === 'false') {
       return reply.send({
         success: true,
         data: { message: 'Chart data excluded as requested' },
       });
     }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(config.DATA_PATH, `${type}_data_${today}.xlsx`);
 
     const chartData = await chartService.generateFrequencyChart(
       fileName,

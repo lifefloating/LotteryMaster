@@ -33,3 +33,6 @@ Excel files
 # OS files
 .DS_Store
 Thumbs.db
+
+# jest
+coverage
