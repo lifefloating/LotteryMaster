@@ -47,23 +47,12 @@ describe('Analyze Controller', () => {
   let expectedSsqFilePath: string;
   let expectedDltFilePath: string;
   let originalDate: DateConstructor;
+  // Mock __dirname for controllers
+  const mockControllersDir = '/Users/gehonglu/remote-code/LotteryMaster/src/controllers';
 
   beforeAll(() => {
     // Save original Date constructor
     originalDate = global.Date;
-
-    // Mock Date constructor
-    const fixedDate = new Date('2024-03-04T12:00:00Z');
-    global.Date = class extends Date {
-      constructor() {
-        super();
-        return fixedDate;
-      }
-
-      static now(): number {
-        return fixedDate.getTime();
-      }
-    } as DateConstructor;
   });
 
   afterAll(() => {
@@ -74,10 +63,10 @@ describe('Analyze Controller', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Fixed date for testing
-    today = '2024-03-04';
-    expectedSsqFilePath = `test_data/ssq_data_${today}.xlsx`;
-    expectedDltFilePath = `test_data/dlt_data_${today}.xlsx`;
+    // Get current date in YYYY-MM-DD format
+    today = new Date().toISOString().slice(0, 10);
+    expectedSsqFilePath = `${mockControllersDir}/../test_data/ssq_data_${today}.xlsx`;
+    expectedDltFilePath = `${mockControllersDir}/../test_data/dlt_data_${today}.xlsx`;
 
     // Mock request
     mockRequest = {
@@ -106,7 +95,12 @@ describe('Analyze Controller', () => {
       await analyzeSSQ(mockRequest, mockReply);
 
       // Verify the service was called with correct arguments
-      expect(path.join).toHaveBeenCalledWith(config.DATA_PATH, `ssq_data_${today}.xlsx`);
+      expect(path.join).toHaveBeenCalledWith(
+        mockControllersDir,
+        '..',
+        config.DATA_PATH,
+        `${config.SSQ_FILE_PREFIX}${today}.xlsx`
+      );
       expect(analyzeService.analyzeLotteryData).toHaveBeenCalledWith(expectedSsqFilePath, 'SSQ');
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
@@ -123,7 +117,12 @@ describe('Analyze Controller', () => {
       await analyzeDLT(mockRequest, mockReply);
 
       // Verify the service was called with correct arguments
-      expect(path.join).toHaveBeenCalledWith(config.DATA_PATH, `dlt_data_${today}.xlsx`);
+      expect(path.join).toHaveBeenCalledWith(
+        mockControllersDir,
+        '..',
+        config.DATA_PATH,
+        `${config.DLT_FILE_PREFIX}${today}.xlsx`
+      );
       expect(analyzeService.analyzeLotteryData).toHaveBeenCalledWith(expectedDltFilePath, 'DLT');
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,

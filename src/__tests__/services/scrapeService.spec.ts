@@ -39,9 +39,12 @@ jest.mock('../../config', () => ({
 }));
 
 describe('LotteryScraper', () => {
-  const mockDate = '2024-01-01';
-  const mockSSQFilename = 'test_data/ssq_data_2024-01-01.xlsx';
-  const mockDLTFilename = 'test_data/dlt_data_2024-01-01.xlsx';
+  // Mock __dirname for services
+  const mockServicesDir = '/Users/gehonglu/remote-code/LotteryMaster/src/services';
+  const mockDataDir = `${mockServicesDir}/../test_data`;
+  let today: string;
+  let mockSSQFilename: string;
+  let mockDLTFilename: string;
 
   // Mock data for SSQ and DLT
   const mockHtml = `
@@ -69,8 +72,10 @@ describe('LotteryScraper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock Date
-    jest.spyOn(global.Date.prototype, 'toISOString').mockReturnValue(`${mockDate}T00:00:00.000Z`);
+    // Get current date in YYYY-MM-DD format
+    today = new Date().toISOString().slice(0, 10);
+    mockSSQFilename = `${mockDataDir}/ssq_data_${today}.xlsx`;
+    mockDLTFilename = `${mockDataDir}/dlt_data_${today}.xlsx`;
 
     // Mock path.join
     (path.join as jest.Mock).mockImplementation((...args) => args.join('/'));
@@ -78,7 +83,7 @@ describe('LotteryScraper', () => {
     // Mock fs functions
     (fs.existsSync as jest.Mock).mockImplementation((path) => {
       // Return false for DATA_DIR check in constructor, true for existing file checks
-      if (path === 'test_data') {
+      if (path === mockDataDir) {
         return false;
       }
       return false; // Default to files not existing to test creation path
@@ -129,12 +134,15 @@ describe('LotteryScraper', () => {
 
   describe('deleteOldFiles', () => {
     it('should delete old files with the given prefix', () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
       // Call the private method using any type assertion
       (scraper as any).deleteOldFiles('ssq_data_');
 
-      expect(fs.readdirSync).toHaveBeenCalledWith('test_data');
-      expect(fs.unlinkSync).toHaveBeenCalledWith('test_data/ssq_data_old.xlsx');
-      expect(fs.unlinkSync).not.toHaveBeenCalledWith('test_data/dlt_data_old.xlsx');
+      expect(fs.readdirSync).toHaveBeenCalledWith(mockDataDir);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(`${mockDataDir}/ssq_data_old.xlsx`);
+      expect(fs.unlinkSync).not.toHaveBeenCalledWith(`${mockDataDir}/dlt_data_old.xlsx`);
     });
   });
 
@@ -147,6 +155,9 @@ describe('LotteryScraper', () => {
 
   describe('scrapeSSQ', () => {
     it('should return existing file info if file already exists', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
       // Mock file exists
       (fs.existsSync as jest.Mock).mockReturnValueOnce(true).mockReturnValueOnce(true);
 
@@ -159,11 +170,14 @@ describe('LotteryScraper', () => {
     });
 
     it('should scrape and save SSQ data if file does not exist', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
       // Mock the implementation of scrapeSSQ to return a successful result
       // This is necessary because we can't fully mock all the internal dependencies
       jest.spyOn(scraper, 'scrapeSSQ').mockResolvedValueOnce({
         success: true,
-        message: 'Successfully created new SSQ data file for 2024-01-01',
+        message: `Successfully created new SSQ data file for ${today}`,
         fileName: mockSSQFilename,
         isNewFile: true,
       });
@@ -194,6 +208,9 @@ describe('LotteryScraper', () => {
 
   describe('scrapeDLT', () => {
     it('should return existing file info if file already exists', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
       // Mock file exists
       (fs.existsSync as jest.Mock).mockReturnValueOnce(true).mockReturnValueOnce(true);
 
@@ -206,11 +223,14 @@ describe('LotteryScraper', () => {
     });
 
     it('should scrape and save DLT data if file does not exist', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
       // Mock the implementation of scrapeDLT to return a successful result
       // This is necessary because we can't fully mock all the internal dependencies
       jest.spyOn(scraper, 'scrapeDLT').mockResolvedValueOnce({
         success: true,
-        message: 'Successfully created new DLT data file for 2024-01-01',
+        message: `Successfully created new DLT data file for ${today}`,
         fileName: mockDLTFilename,
         isNewFile: true,
       });
