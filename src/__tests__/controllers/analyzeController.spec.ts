@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { analyzeSSQ, analyzeDLT } from '../../controllers/analyzeController';
 import analyzeService from '../../services/analyzeService';
-import path from 'path';
+import * as path from 'path';
 import config from '../../config';
 
 // Mock dependencies
 jest.mock('../../services/analyzeService');
 jest.mock('path', () => ({
-  __esModule: true,
+  join: jest.fn((...args) => args.join('/')),
   default: {
     join: jest.fn((...args) => args.join('/')),
   },

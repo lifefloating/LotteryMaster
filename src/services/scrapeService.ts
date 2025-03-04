@@ -2,7 +2,6 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as XLSX from 'xlsx';
 import { LotteryData, ScrapeResult } from '../types/lottery';
-import iconv from 'iconv-lite';
 import * as fs from 'fs';
 import * as path from 'path';
 import config from '../config'; // Import config
@@ -63,7 +62,7 @@ class LotteryScraper {
         logger.error('Response data is empty or undefined');
         throw new Error('No data received from SSQ URL');
       }
-      
+
       const $ = cheerio.load(response.data);
       logger.info(`Cheerio loaded the HTML content`);
       const data: LotteryData[] = [];
@@ -132,7 +131,7 @@ class LotteryScraper {
         logger.error('Response data is empty or undefined');
         throw new Error('No data received from DLT URL');
       }
-      
+
       const $ = cheerio.load(response.data);
       logger.info(`Cheerio loaded the HTML content`);
       const data: LotteryData[] = [];

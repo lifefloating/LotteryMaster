@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import path from 'path';
+import * as path from 'path';
 import config from '../config';
 import analyzeService from '../services/analyzeService';
 

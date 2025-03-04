@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "start": "tsx src/app.ts",
     "dev": "tsx src/app.ts",
-    "build": "tsc",
+    "build": "tsc && cp .env dist/ && cp -r lottery_data dist/",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
