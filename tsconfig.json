@@ -32,7 +32,11 @@
     "node_modules",
     "dist",
     "dev",
-    "dev/examples"
+    "dev/examples",
+    "src/__tests__",
+    "jest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ],
   "ts-node": {
     "require": [

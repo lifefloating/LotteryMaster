@@ -8,7 +8,7 @@ import * as path from 'path';
 import config from '../config'; // Import config
 import { createLogger } from '../utils/logger';
 
-const logger = createLogger('scraperService');
+const logger = createLogger('scrapeService');
 const isValidNumber = (n: any): boolean => typeof n === 'number' && Number.isFinite(n);
 
 class LotteryScraper {
@@ -56,11 +56,16 @@ class LotteryScraper {
         };
       }
 
-      const response = await axios.get(this.getFullUrl(this.SSQ_BASE_URL), {
-        responseType: 'arraybuffer',
-      });
-      const decodedData = iconv.decode(response.data, 'gb2312');
-      const $ = cheerio.load(decodedData);
+      logger.info(`Fetching SSQ data from URL: ${this.getFullUrl(this.SSQ_BASE_URL)}`);
+      const response = await axios.get(this.getFullUrl(this.SSQ_BASE_URL));
+      logger.info(`Response received. Status: ${response.status}`);
+      if (!response.data) {
+        logger.error('Response data is empty or undefined');
+        throw new Error('No data received from SSQ URL');
+      }
+      
+      const $ = cheerio.load(response.data);
+      logger.info(`Cheerio loaded the HTML content`);
       const data: LotteryData[] = [];
 
       $('tr.t_tr1').each((_, element) => {
@@ -120,8 +125,16 @@ class LotteryScraper {
         };
       }
 
+      logger.info(`Fetching DLT data from URL: ${this.getFullUrl(this.DLT_BASE_URL)}`);
       const response = await axios.get(this.getFullUrl(this.DLT_BASE_URL));
+      logger.info(`Response received. Status: ${response.status}`);
+      if (!response.data) {
+        logger.error('Response data is empty or undefined');
+        throw new Error('No data received from DLT URL');
+      }
+      
       const $ = cheerio.load(response.data);
+      logger.info(`Cheerio loaded the HTML content`);
       const data: LotteryData[] = [];
 
       $('tr.t_tr1').each((_, element) => {
