@@ -3,8 +3,8 @@
 
 ### ✨ 主要功能 (Key Features)
 
-- 📊 **数据处理**:  抓取彩票数据，保存到Excel文件。
-- 🤖 **输出报告**:  集成通义千问大模型(Qwen-MAX)，根据prompt生成分析报告，包括号码预测、号码推荐、号码趋势等。
+- 📊 **数据处理**:  抓取彩票数据，保存到Excel文件，支持抓取全部期数。
+- 🤖 **输出报告**:  集成通义千问大模型(Qwen-MAX)/（Qwen-Long），根据prompt生成分析报告，包括号码预测、号码推荐、号码趋势等。
 - 📱 **多端访问支持**:   支持Web、移动App等多平台访问，方便用户随时随地获取彩票分析信息。前端项目地址: [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp)
 
 ## 🛠️ 技术栈 (Tech Stack)
@@ -15,12 +15,29 @@
 <a href="https://cheerio.js.org/"><img src="https://img.shields.io/badge/Cheerio.js-orange?style=flat-square&logo=css3&logoColor=white" alt="Cheerio.js Badge"/></a> 
 <a href="https://getpino.io/"><img src="https://img.shields.io/badge/Pino-green?style=flat-square&logo=npm&logoColor=white" alt="Pino Badge"/></a>
 <a href="https://www.npmjs.com/package/xlsx"><img src="https://img.shields.io/badge/xlsx-lightgrey?style=flat-square&logo=npm&logoColor=red" alt="xlsx Badge"/></a>
+<a href="https://jestjs.io/"><img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest Badge"/></a>
 
 - **AI 模型**
-  - [通义千问 Qwen-MAX API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告。
+  - [通义千问 Qwen API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告，趋势分析图表。
   
 - **前端开发**
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
+
+- **测试覆盖率**
+- <a href="#"><img src="https://img.shields.io/badge/Coverage-53.93%25-yellow" alt="Coverage Badge"/></a>
+
+  **总体覆盖率指标**
+
+  | 指标 | 覆盖率 |
+  |------|--------|
+  | (Statements) | 53.93% |
+  | (Branches) | 42.94% |
+  | (Functions) | 42.37% |
+  | (Lines) | 54.43% |
+
+  **说明**
+  - 后续补全单测
+  - 具体的数据执行 `pnpm run test:coverage` 查看
 
 ## 🚀 快速开始 (Quick Start)
 
@@ -91,9 +108,18 @@
 curl http://localhost:3008/api/health
 ```
 
-### 🖼️ 接口测试图
+### 🖼️ 接口测试
 
 ![分析接口测试结果](./images/analyze_result.png)
+
+### 🧪 运行测试 (Run Tests)
+
+运行所有测试并生成覆盖率报告：
+```bash
+pnpm test:coverage
+```
+
+测试覆盖率报告将生成在 `coverage` 目录下。
 
 ### 📝 TODO
   - 尝试切换deepseek或者其他的测试比较一下
