@@ -11,13 +11,6 @@ jest.mock('cheerio');
 jest.mock('xlsx');
 jest.mock('fs');
 jest.mock('path');
-jest.mock('iconv-lite', () => ({
-  decode: jest
-    .fn()
-    .mockReturnValue(
-      '<html><table><tr class="t_tr1"><td>2024001</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td></tr></table></html>'
-    ),
-}));
 jest.mock('../../utils/logger', () => ({
   createLogger: jest.fn(() => ({
     info: jest.fn(),
