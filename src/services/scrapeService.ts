@@ -19,17 +19,23 @@ class LotteryScraper {
   private readonly DLT_PREFIX = config.DLT_FILE_PREFIX;
 
   constructor() {
-    if (!fs.existsSync(this.DATA_DIR)) {
-      fs.mkdirSync(this.DATA_DIR);
+    const dataDir = path.join(__dirname, '..', this.DATA_DIR);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
+  }
+
+  private getDataDirPath(): string {
+    return path.join(__dirname, '..', this.DATA_DIR);
   }
 
   private deleteOldFiles(prefix: string): void {
     const today = new Date().toISOString().slice(0, 10);
-    const files = fs.readdirSync(this.DATA_DIR);
+    const dataDir = this.getDataDirPath();
+    const files = fs.readdirSync(dataDir);
     files.forEach((file) => {
       if (file.startsWith(prefix) && !file.includes(today)) {
-        fs.unlinkSync(path.join(this.DATA_DIR, file));
+        fs.unlinkSync(path.join(dataDir, file));
       }
     });
   }
@@ -41,7 +47,7 @@ class LotteryScraper {
   async scrapeSSQ(): Promise<ScrapeResult> {
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const filename = path.join(this.DATA_DIR, `${this.SSQ_PREFIX}${today}.xlsx`);
+      const filename = path.join(this.getDataDirPath(), `${this.SSQ_PREFIX}${today}.xlsx`);
 
       // Delete old SSQ files before checking/creating new one
       this.deleteOldFiles(this.SSQ_PREFIX);
@@ -110,7 +116,7 @@ class LotteryScraper {
   async scrapeDLT(): Promise<ScrapeResult> {
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const filename = path.join(this.DATA_DIR, `${this.DLT_PREFIX}${today}.xlsx`);
+      const filename = path.join(this.getDataDirPath(), `${this.DLT_PREFIX}${today}.xlsx`);
 
       // Delete old DLT files before checking/creating new one
       this.deleteOldFiles(this.DLT_PREFIX);

@@ -9,7 +9,12 @@ export const analyzeSSQ = async (
 ): Promise<FastifyReply> => {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(config.DATA_PATH, `ssq_data_${today}.xlsx`);
+    const fileName = path.join(
+      __dirname,
+      '..',
+      config.DATA_PATH,
+      `${config.SSQ_FILE_PREFIX}${today}.xlsx`
+    );
     const analysis = await analyzeService.analyzeLotteryData(fileName, 'SSQ');
     return reply.send({
       success: true,
@@ -34,7 +39,13 @@ export const analyzeDLT = async (
 ): Promise<FastifyReply> => {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(config.DATA_PATH, `dlt_data_${today}.xlsx`);
+    // 使用相对路径，相对于当前文件所在目录
+    const fileName = path.join(
+      __dirname,
+      '..',
+      config.DATA_PATH,
+      `${config.DLT_FILE_PREFIX}${today}.xlsx`
+    );
     const analysis = await analyzeService.analyzeLotteryData(fileName, 'DLT');
     return reply.send({
       success: true,
