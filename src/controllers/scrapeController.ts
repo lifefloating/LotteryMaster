@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import scraper from '../services/scraperService';
+import scraper from '../services/scrapeService';
 
 export const scrapeSSQ = async (
   request: FastifyRequest,

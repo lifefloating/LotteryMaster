@@ -1,9 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { scrapeSSQ, scrapeDLT } from '../../controllers/scrapeController';
-import scraper from '../../services/scraperService';
+import scraper from '../../services/scrapeService';
 
 // Mock scraper service
-jest.mock('../../services/scraperService');
+jest.mock('../../services/scrapeService');
 
 describe('Scrape Controller', () => {
   let mockRequest: Partial<FastifyRequest>;
