@@ -36,7 +36,6 @@
   | Lines | 83.05% |
 
   **说明**
-  - 后续补全单测
   - 具体的数据执行 `pnpm run test:coverage` 查看
 
 ## 🚀 快速开始 (Quick Start)
@@ -124,7 +123,7 @@ pnpm test:coverage
 ### 📝 TODO
   - 尝试切换deepseek或者其他的测试比较一下
   - 做成通用类型对，支持多种模型
-  - 前端页面样式?交互?
+  - bun 暂时先这样，后续会切换
 
 
 文档将在后续继续完善。
