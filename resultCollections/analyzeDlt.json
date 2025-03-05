@@ -1,0 +1,188 @@
+{
+    "success": true,
+    "analysis": {
+      "raw": "```json\n{\n  \"frequencyAnalysis\": {\n    \"frontZone\": [\n      {\"number\": 1, \"frequency\": 5},\n      {\"number\": 5, \"frequency\": 4},\n      {\"number\": 29, \"frequency\": 4},\n      {\"number\": 18, \"frequency\": 4},\n      {\"number\": 35, \"frequency\": 4}\n    ],\n    \"backZone\": [\n      {\"number\": 3, \"frequency\": 5},\n      {\"number\": 10, \"frequency\": 5},\n      {\"number\": 2, \"frequency\": 4}\n    ]\n  },\n  \"hotColdAnalysis\": {\n    \"frontZone\": {\n      \"hotNumbers\": [1, 5, 18, 29, 35],\n      \"coldNumbers\": [14, 26, 33],\n      \"risingNumbers\": [7, 11, 19]\n    },\n    \"backZone\": {\n      \"hotNumbers\": [3, 10, 2],\n      \"coldNumbers\": [11, 12],\n      \"risingNumbers\": [4, 9]\n    }\n  },\n  \"missingAnalysis\": {\n    \"frontZone\": {\n      \"maxMissingNumber\": 14,\n      \"missingTrend\": \"近期前区号码遗漏值较为均匀，但部分号码如14、26和33长期未出现。\",\n      \"warnings\": [\"注意号码14已连续多期未出现，可能即将补号。\", \"号码26和33也需关注其补号机会。\"]\n    },\n    \"backZone\": {\n      \"missingStatus\": \"后区号码3、10频繁出现，而11、12则较少出现。\",\n      \"warnings\": [\"后区号码11、12遗漏值较高，建议关注。\"]\n    }\n  },\n  \"trendAnalysis\": {\n    \"frontZoneFeatures\": [\"前区号码分布较为均匀，但偶数号码略显不足。\", \"近期小号（1-15）和大号（16-35）交替出现。\"],\n    \"backZoneFeatures\": [\"后区号码集中在3、10，其他号码出现频率较低。\"],\n    \"keyTurningPoints\": [\"前区号码1、5、18、29、35为关键点，需重点关注。\", \"后区号码3、10为关键点，需重点关注。\"]\n  },\n  \"oddEvenAnalysis\": {\n    \"frontZoneRatio\": \"前区奇偶比为13:12，较为均衡。\",\n    \"backZoneRatio\": \"后区奇偶比为10:10，完全均衡。\",\n    \"recommendedRatio\": \"推荐前区奇偶比为3:2或2:3，后区保持1:1。\"\n  },\n  \"recommendations\": [\n    {\n      \"frontZone\": [1, 7, 14, 26, 33],\n      \"backZone\": [4, 11]\n    },\n    {\n      \"frontZone\": [5, 18, 29, 35, 32],\n      \"backZone\": [3, 10]\n    },\n    {\n      \"frontZone\": [1, 11, 19, 22, 27],\n      \"backZone\": [2, 9]\n    },\n    {\n      \"frontZone\": [5, 9, 18, 29, 35],\n      \"backZone\": [4, 12]\n    },\n    {\n      \"frontZone\": [7, 12, 21, 25, 31],\n      \"backZone\": [3, 10]\n    }\n  ],\n  \"riskWarnings\": [\n    \"彩票有风险，投注需谨慎。\",\n    \"请量力而行，不要超出自己的经济承受能力。\",\n    \"理性购彩，切勿沉迷。\"\n  ]\n}\n```",
+      "structured": {
+        "frequencyAnalysis": {
+          "frontZone": [
+            {
+              "number": 1,
+              "frequency": 5
+            },
+            {
+              "number": 5,
+              "frequency": 4
+            },
+            {
+              "number": 29,
+              "frequency": 4
+            },
+            {
+              "number": 18,
+              "frequency": 4
+            },
+            {
+              "number": 35,
+              "frequency": 4
+            }
+          ],
+          "backZone": [
+            {
+              "number": 3,
+              "frequency": 5
+            },
+            {
+              "number": 10,
+              "frequency": 5
+            },
+            {
+              "number": 2,
+              "frequency": 4
+            }
+          ]
+        },
+        "hotColdAnalysis": {
+          "frontZone": {
+            "hotNumbers": [
+              1,
+              5,
+              18,
+              29,
+              35
+            ],
+            "coldNumbers": [
+              14,
+              26,
+              33
+            ],
+            "risingNumbers": [
+              7,
+              11,
+              19
+            ]
+          },
+          "backZone": {
+            "hotNumbers": [
+              3,
+              10,
+              2
+            ],
+            "coldNumbers": [
+              11,
+              12
+            ],
+            "risingNumbers": [
+              4,
+              9
+            ]
+          }
+        },
+        "missingAnalysis": {
+          "frontZone": {
+            "maxMissingNumber": 14,
+            "missingTrend": "近期前区号码遗漏值较为均匀，但部分号码如14、26和33长期未出现。",
+            "warnings": [
+              "注意号码14已连续多期未出现，可能即将补号。",
+              "号码26和33也需关注其补号机会。"
+            ]
+          },
+          "backZone": {
+            "missingStatus": "后区号码3、10频繁出现，而11、12则较少出现。",
+            "warnings": [
+              "后区号码11、12遗漏值较高，建议关注。"
+            ]
+          }
+        },
+        "trendAnalysis": {
+          "frontZoneFeatures": [
+            "前区号码分布较为均匀，但偶数号码略显不足。",
+            "近期小号（1-15）和大号（16-35）交替出现。"
+          ],
+          "backZoneFeatures": [
+            "后区号码集中在3、10，其他号码出现频率较低。"
+          ],
+          "keyTurningPoints": [
+            "前区号码1、5、18、29、35为关键点，需重点关注。",
+            "后区号码3、10为关键点，需重点关注。"
+          ]
+        },
+        "oddEvenAnalysis": {
+          "frontZoneRatio": "前区奇偶比为13:12，较为均衡。",
+          "backZoneRatio": "后区奇偶比为10:10，完全均衡。",
+          "recommendedRatio": "推荐前区奇偶比为3:2或2:3，后区保持1:1。"
+        },
+        "recommendations": [
+          {
+            "frontZone": [
+              1,
+              7,
+              14,
+              26,
+              33
+            ],
+            "backZone": [
+              4,
+              11
+            ]
+          },
+          {
+            "frontZone": [
+              5,
+              18,
+              29,
+              35,
+              32
+            ],
+            "backZone": [
+              3,
+              10
+            ]
+          },
+          {
+            "frontZone": [
+              1,
+              11,
+              19,
+              22,
+              27
+            ],
+            "backZone": [
+              2,
+              9
+            ]
+          },
+          {
+            "frontZone": [
+              5,
+              9,
+              18,
+              29,
+              35
+            ],
+            "backZone": [
+              4,
+              12
+            ]
+          },
+          {
+            "frontZone": [
+              7,
+              12,
+              21,
+              25,
+              31
+            ],
+            "backZone": [
+              3,
+              10
+            ]
+          }
+        ],
+        "riskWarnings": [
+          "彩票有风险，投注需谨慎。",
+          "请量力而行，不要超出自己的经济承受能力。",
+          "理性购彩，切勿沉迷。"
+        ]
+      }
+    }
+  }

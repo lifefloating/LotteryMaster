@@ -19,6 +19,7 @@
 
 - **AI 模型**
   - [通义千问 Qwen API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告，趋势分析图表。
+  - `.env.example`中的`API_MODEL`可填写配置：`qwen-turbo` || `qwen-long` || `qwen-max`
   
 - **前端开发**
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
@@ -107,9 +108,11 @@
 curl http://localhost:3008/api/health
 ```
 
-### 🖼️ 接口测试
+### 🖼️ 接口测试结果
 
-![分析接口测试结果](./images/analyze_result.png)
+以 api/analyze/dlt 为例，获取结果:
+
+[完整结果](./resultCollections/analyzeDlt.json)
 
 ### 🧪 运行测试 (Run Tests)
 

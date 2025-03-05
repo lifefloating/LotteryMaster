@@ -20,7 +20,6 @@ jest.mock('../config', () => ({
     DLT_FILE_PREFIX: 'dlt_data_',
     API_URL: 'https://test-api.example.com/v1/chat/completions',
     API_MODEL: 'test-model',
-    API_MODEL_LONG: 'test-model-long',
     API_TIMEOUT: 30000,
     API_TEMPERATURE: 0.3,
     API_MAX_TOKENS: 1000,

@@ -16,7 +16,6 @@
     "PORT": "3008",
     "API_KEY": "@api_key",
     "API_MODEL": "qwen-turbo",
-    "API_MODEL_LONG": "qwen-long",
     "API_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
     "API_TEMPERATURE": "0.2",
     "API_MAX_TOKENS": "3000",

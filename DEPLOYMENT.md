@@ -20,7 +20,6 @@ PORT=3008
 # API Configuration
 API_KEY=your_API_KEY_here
 API_MODEL=qwen-turbo
-API_MODEL_LONG=qwen-long
 API_URL=https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
 ...
 ```
@@ -56,7 +55,6 @@ docker run -d -p 3008:3008 --name lottery-master-app \
   --env PORT=3008 \
   --env API_KEY=your_API_KEY_here \
   --env API_MODEL=qwen-turbo \
-  --env API_MODEL_LONG=qwen-long \
   --env API_URL=https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation \
   lottery-master
 ```
