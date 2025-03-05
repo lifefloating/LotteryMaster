@@ -19,7 +19,28 @@
 
 - **AI 模型**
   - [通义千问 Qwen API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告，趋势分析图表。
-  - `.env.example`中的`API_MODEL`可填写配置：`qwen-turbo` || `qwen-long` || `qwen-max`
+  
+  #### API 参数说明
+  
+  `.env.example` 中的 API 相关参数说明：
+  
+  - **API_MODEL**: 选择使用的模型，可选值包括：
+    - `qwen-turbo`: 响应速度快，适合简单的分析任务
+    - `qwen-long`: 支持更长的上下文
+    - `qwen-max`: 功能最强大的模型，分析能力最佳
+  
+  - **API_TEMPERATURE**: 控制输出的随机性，取值范围 0-1
+    - 值越低（如 0.1）: 输出更确定、更保守，适合分析报告等需要准确性的场景
+    - 值越高（如 0.8）: 输出更多样、更创造性，适合创意内容生成
+  
+  - **API_MAX_TOKENS**: 限制模型返回的最大 Token 数量
+    - 较大的值允许模型生成更详细的分析结果
+    - 默认值为 3000，可根据需要调整
+  
+  - **API_TIMEOUT**: API 请求超时时间（毫秒）
+    - 默认值为 120000（2分钟）
+  
+  更多详细参数说明请参考[通义千问 API 文档](https://help.aliyun.com/zh/model-studio/developer-reference/use-qwen-by-calling-api)
   
 - **前端开发**
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
