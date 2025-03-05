@@ -2,6 +2,8 @@ import * as XLSX from 'xlsx';
 import { createLogger } from '../utils/logger';
 import { LotteryData } from '../types/lottery';
 import * as fs from 'fs';
+import * as path from 'path';
+import config from '../config';
 
 const logger = createLogger('chartService');
 
@@ -43,18 +45,23 @@ export interface TrendAnalysisResult {
 class ChartService {
   /**
    * Generate frequency trend data for lottery numbers
-   * @param filename Path to the Excel file
    * @param type The lottery type (SSQ or DLT)
    * @param periodCount Number of periods to analyze (e.g., 30, 50, 100)
    * @param zoneType 'red' for red balls, 'blue' for blue balls
    */
+
+  private readonly DATA_DIR = config.DATA_PATH;
+  private readonly SSQ_PREFIX = config.SSQ_FILE_PREFIX;
+  private readonly DLT_PREFIX = config.DLT_FILE_PREFIX;
+
   async generateNumberTrend(
-    filename: string,
     type: 'SSQ' | 'DLT',
     periodCount: number = 100,
     zoneType: 'red' | 'blue' = 'red'
   ): Promise<TrendAnalysisResult> {
     try {
+      const filename = this.getDataFilePath(type);
+
       // Check if file exists
       if (!fs.existsSync(filename)) {
         logger.error(`File not found: ${filename}`);
@@ -386,12 +393,13 @@ class ChartService {
    * Generate the number frequency chart
    */
   async generateFrequencyChart(
-    filename: string,
     type: 'SSQ' | 'DLT',
     periodCount: number = 100,
     zoneType: 'red' | 'blue' = 'red'
   ): Promise<ChartData> {
     try {
+      const filename = this.getDataFilePath(type);
+
       // Check if file exists
       if (!fs.existsSync(filename)) {
         logger.error(`File not found: ${filename}`);
@@ -611,6 +619,16 @@ class ChartService {
         },
       },
     };
+  }
+
+  private getDataDirPath(): string {
+    return path.join(__dirname, '..', this.DATA_DIR);
+  }
+
+  private getDataFilePath(type: 'SSQ' | 'DLT'): string {
+    const today = new Date().toISOString().slice(0, 10);
+    const prefix = type === 'SSQ' ? this.SSQ_PREFIX : this.DLT_PREFIX;
+    return path.join(this.getDataDirPath(), `${prefix}${today}.xlsx`);
   }
 }
 

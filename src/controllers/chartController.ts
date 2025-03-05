@@ -1,6 +1,4 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import path from 'path';
-import config from '../config';
 import chartService from '../services/chartService';
 
 interface ChartQuerystring {
@@ -31,10 +29,7 @@ export const getTrendChart = async (
       });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(config.DATA_PATH, `${type}_data_${today}.xlsx`);
-
-    const result = await chartService.generateNumberTrend(fileName, lotteryType, periods, zoneType);
+    const result = await chartService.generateNumberTrend(lotteryType, periods, zoneType);
 
     if (includeChartData === 'false') {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -87,15 +82,7 @@ export const getFrequencyChart = async (
       });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const fileName = path.join(config.DATA_PATH, `${type}_data_${today}.xlsx`);
-
-    const chartData = await chartService.generateFrequencyChart(
-      fileName,
-      lotteryType,
-      periods,
-      zoneType
-    );
+    const chartData = await chartService.generateFrequencyChart(lotteryType, periods, zoneType);
 
     return reply.send({
       success: true,
