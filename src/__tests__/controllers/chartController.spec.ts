@@ -1,23 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { getTrendChart, getFrequencyChart } from '../../controllers/chartController';
 import chartService from '../../services/chartService';
-import path from 'path';
 
 // Mock dependencies
 jest.mock('../../services/chartService');
-jest.mock('path', () => ({
-  __esModule: true,
-  default: {
-    join: jest.fn((...args) => args.join('/')),
-  },
-}));
-jest.mock('../../config', () => ({
-  __esModule: true,
-  default: {
-    DATA_PATH: 'test_data',
-    SSQ_FILE_PREFIX: 'ssq_data_',
-    DLT_FILE_PREFIX: 'dlt_data_',
-  },
+jest.mock('dotenv', () => ({
+  config: jest.fn(),
 }));
 
 interface ChartQuerystring {
@@ -45,9 +33,6 @@ describe('Chart Controller', () => {
 
   let mockRequest: TestRequest;
   let mockReply: FastifyReply;
-  let today: string;
-  let expectedSsqFilePath: string;
-  let expectedDltFilePath: string;
   let originalDate: DateConstructor;
 
   beforeAll(() => {
@@ -75,11 +60,6 @@ describe('Chart Controller', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Fixed date for testing
-    today = '2024-03-04';
-    expectedSsqFilePath = `test_data/ssq_data_${today}.xlsx`;
-    expectedDltFilePath = `test_data/dlt_data_${today}.xlsx`;
 
     // Mock request
     mockRequest = {
@@ -118,13 +98,7 @@ describe('Chart Controller', () => {
       await getTrendChart(mockRequest, mockReply);
 
       // Verify the service was called
-      expect(path.join).toHaveBeenCalled();
-      expect(chartService.generateNumberTrend).toHaveBeenCalledWith(
-        expectedSsqFilePath,
-        'SSQ',
-        100,
-        'red'
-      );
+      expect(chartService.generateNumberTrend).toHaveBeenCalledWith('SSQ', 100, 'red');
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         data: mockTrendData,
@@ -142,6 +116,42 @@ describe('Chart Controller', () => {
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         data: rest,
+      });
+    });
+
+    it('should handle invalid period count (negative number)', async () => {
+      mockRequest.query.periodCount = '-10';
+
+      await getTrendChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    });
+
+    it('should handle invalid period count (non-numeric)', async () => {
+      mockRequest.query.periodCount = 'abc';
+
+      await getTrendChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    });
+
+    it('should handle invalid period count (zero)', async () => {
+      mockRequest.query.periodCount = '0';
+
+      await getTrendChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
       });
     });
 
@@ -174,13 +184,7 @@ describe('Chart Controller', () => {
       await getFrequencyChart(request, mockReply);
 
       // Verify the service was called
-      expect(path.join).toHaveBeenCalled();
-      expect(chartService.generateFrequencyChart).toHaveBeenCalledWith(
-        expectedDltFilePath,
-        'DLT',
-        50,
-        'blue'
-      );
+      expect(chartService.generateFrequencyChart).toHaveBeenCalledWith('DLT', 50, 'blue');
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         data: mockTrendData,
@@ -197,12 +201,45 @@ describe('Chart Controller', () => {
 
       await getFrequencyChart(request, mockReply);
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { chartData, ...rest } = mockTrendData;
-
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         data: { message: 'Chart data excluded as requested' },
+      });
+    });
+
+    it('should handle invalid period count (negative number)', async () => {
+      mockRequest.query.periodCount = '-10';
+
+      await getFrequencyChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    });
+
+    it('should handle invalid period count (non-numeric)', async () => {
+      mockRequest.query.periodCount = 'abc';
+
+      await getFrequencyChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
+      });
+    });
+
+    it('should handle invalid period count (zero)', async () => {
+      mockRequest.query.periodCount = '0';
+
+      await getFrequencyChart(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
+      expect(mockReply.send).toHaveBeenCalledWith({
+        success: false,
+        error: 'Period count must be a positive number',
       });
     });
 
