@@ -16,6 +16,8 @@ interface Config {
   API_TIMEOUT: number;
   API_TEMPERATURE: number;
   API_MAX_TOKENS: number;
+  API_TOP_P: number;
+  API_PRESENCE_PENALTY: number;
   RECENT_DATA_COUNT: number;
   SSQ_FILE_PREFIX: string;
   DLT_FILE_PREFIX: string;
@@ -37,6 +39,8 @@ const configDefault: Config = {
   API_TIMEOUT: parseInt(process.env.API_TIMEOUT ?? '30000', 10),
   API_TEMPERATURE: parseFloat(process.env.API_TEMPERATURE ?? '0.3'),
   API_MAX_TOKENS: parseInt(process.env.API_MAX_TOKENS ?? '1000', 10),
+  API_TOP_P: parseFloat(process.env.API_TOP_P ?? '0.6'),
+  API_PRESENCE_PENALTY: parseFloat(process.env.API_PRESENCE_PENALTY ?? '0.95'),
   RECENT_DATA_COUNT: parseInt(process.env.RECENT_DATA_COUNT ?? '20', 10),
   SSQ_FILE_PREFIX: process.env.SSQ_FILE_PREFIX ?? 'ssq_data_',
   DLT_FILE_PREFIX: process.env.DLT_FILE_PREFIX ?? 'dlt_data_',

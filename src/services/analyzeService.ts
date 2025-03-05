@@ -20,6 +20,8 @@ class AnalyzeService {
   private readonly API_TIMEOUT = config.API_TIMEOUT;
   private readonly TEMPERATURE = config.API_TEMPERATURE;
   private readonly MAX_TOKENS = config.API_MAX_TOKENS;
+  private readonly TOP_P = config.API_TOP_P;
+  private readonly PRESENCE_PENALTY = config.API_PRESENCE_PENALTY;
   private readonly CACHE_DURATION = config.CACHE_DURATION;
   private readonly API_MODEL = config.API_MODEL;
 
@@ -43,7 +45,6 @@ class AnalyzeService {
 
       logger.info(`Successfully loaded ${data.length} records from Excel file`);
 
-      // 检查缓存
       const cacheKey = this.getCacheKey(filename, data);
       const cachedResult = this.cache.get(cacheKey);
       if (cachedResult && this.isValidCache(cachedResult)) {
@@ -54,9 +55,8 @@ class AnalyzeService {
       const prompt = this.buildStructuredAnalysisPrompt(data);
       logger.info('Built structured analysis prompt, sending request to AI service...');
 
-      const response = await axios.post(
-        this.API_URL,
-        {
+      try {
+        const requestBody: any = {
           model: this.API_MODEL,
           messages: [
             {
@@ -68,73 +68,83 @@ class AnalyzeService {
               content: prompt,
             },
           ],
-          temperature: this.TEMPERATURE,
-          max_tokens: this.MAX_TOKENS,
-        },
-        {
+        };
+
+        // 非 deepseek-r1 模型时添加这些参数
+        if (!this.API_MODEL.includes('deepseek-r1')) {
+          requestBody.temperature = this.TEMPERATURE;
+          requestBody.max_tokens = this.MAX_TOKENS;
+          requestBody.top_p = this.TOP_P;
+          requestBody.presence_penalty = this.PRESENCE_PENALTY;
+        } else {
+          // deepseek-r1 max_tokens 参数
+          requestBody.max_tokens = this.MAX_TOKENS;
+        }
+
+        const response = await axios.post(this.API_URL, requestBody, {
           headers: {
             Authorization: `Bearer ${this.API_KEY}`,
             'Content-Type': 'application/json',
             'Accept-Encoding': 'gzip,deflate',
           },
           timeout: this.API_TIMEOUT,
+        });
+
+        logger.info('Successfully received response from AI service');
+
+        // 验证响应数据的完整性
+        if (!response.data) {
+          throw new Error('Empty response from AI service');
         }
-      );
 
-      logger.info('Successfully received response from AI service');
+        if (!response.data.choices?.[0]?.message?.content) {
+          logger.error('Invalid API response structure:', JSON.stringify(response.data, null, 2));
+          throw new Error('Invalid response structure from AI service');
+        }
 
-      // 验证响应数据的完整性
-      if (!response.data) {
-        throw new Error('Empty response from AI service');
-      }
+        const rawContent = response.data.choices[0].message.content;
+        logger.info('Raw content from AI service:', rawContent.substring(0, 100) + '...');
 
-      if (!response.data.choices?.[0]?.message?.content) {
-        logger.error('Invalid API response structure:', response.data);
-        throw new Error('Invalid response structure from AI service');
-      }
+        // 解析结构化数据
+        const result = this.parseStructuredResponse(rawContent);
 
-      const rawContent = response.data.choices[0].message.content;
-      logger.info('Raw content from AI service:', rawContent.substring(0, 100) + '...');
+        // 验证解析结果
+        if (!result.structured || Object.keys(result.structured).length === 0) {
+          logger.error('Failed to parse structured data from AI response');
+          throw new Error('Failed to parse AI response into structured format');
+        }
 
-      // 解析结构化数据和Markdown
-      const result = this.parseStructuredResponse(rawContent);
-
-      // 验证解析结果
-      if (!result.structured || Object.keys(result.structured).length === 0) {
-        logger.error('Failed to parse structured data from AI response');
-        throw new Error('Failed to parse AI response into structured format');
-      }
-
-      // 保存到缓存
-      this.cache.set(cacheKey, {
-        data: result,
-        id: uuidv4(),
-        createdAt: Date.now(),
-      });
-
-      return result;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        logger.error('API Request Error:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          message: error.message,
-          url: this.API_URL,
-          timeout: this.API_TIMEOUT,
+        // 保存到缓存
+        this.cache.set(cacheKey, {
+          data: result,
+          id: uuidv4(),
+          createdAt: Date.now(),
         });
-        throw new Error(`API Request failed: ${error.message} (Status: ${error.response?.status})`);
-      } else if (error instanceof Error) {
-        logger.error('Error analyzing lottery data:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
+
+        return result;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          logger.error('API Request Error:', {
+            status: axiosError.response?.status,
+            statusText: axiosError.response?.statusText,
+            data: axiosError.response?.data,
+            message: axiosError.message,
+            config: {
+              url: axiosError.config?.url,
+              method: axiosError.config?.method,
+              headers: axiosError.config?.headers,
+              data: JSON.stringify(axiosError.config?.data).substring(0, 500) + '...',
+            },
+          });
+        } else {
+          logger.error('Non-Axios Error during API request:', error);
+        }
         throw error;
-      } else {
-        logger.error('Unknown error:', error);
-        throw new Error('Unknown error occurred during analysis');
       }
+    } catch (error) {
+      logger.error('Error in analyzeLotteryData:', error);
+      throw error;
     }
   }
 

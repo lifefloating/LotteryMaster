@@ -15,9 +15,14 @@ jest.mock('axios', () => {
       ],
     },
   });
+  mockPost.mockRejectedValueOnce = jest.fn();
   return {
-    default: { post: mockPost },
+    default: {
+      post: mockPost,
+      isAxiosError: jest.fn().mockImplementation(() => false),
+    },
     post: mockPost,
+    isAxiosError: jest.fn().mockImplementation(() => false),
   };
 });
 jest.mock('xlsx');
@@ -39,6 +44,8 @@ jest.mock('../../config', () => ({
     API_TIMEOUT: 30000,
     API_TEMPERATURE: 0.3,
     API_MAX_TOKENS: 1000,
+    API_TOP_P: 0.6,
+    API_PRESENCE_PENALTY: 0.95,
     CACHE_DURATION: 3600000,
     RECENT_DATA_COUNT: 20,
   },
@@ -96,8 +103,10 @@ describe('AnalyzeService', () => {
       // Reset mocks to ensure clean state
       jest.clearAllMocks();
 
-      // Mock axios to reject with a network error
-      (axios.post as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      // 使用不同的方式模拟错误
+      (axios.post as jest.Mock).mockImplementationOnce(() => {
+        throw new Error('Network error');
+      });
 
       const result = await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
 
@@ -165,7 +174,82 @@ describe('AnalyzeService', () => {
       });
 
       await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
-      // todo: add test for the prompt
+    });
+
+    it('should include all parameters for non-deepseek-r1 models', async () => {
+      // Replace require with import
+      const analyzeService = (await import('../../services/analyzeService')).default;
+
+      const originalPost = axios.post;
+
+      try {
+        // 替换 axios.post
+        axios.post = jest.fn().mockImplementation((url, data) => {
+          expect(data).toHaveProperty('model');
+          expect(data).toHaveProperty('messages');
+          expect(data).toHaveProperty('temperature');
+          expect(data).toHaveProperty('max_tokens');
+          expect(data).toHaveProperty('top_p');
+          expect(data).toHaveProperty('presence_penalty');
+
+          return Promise.resolve({
+            data: {
+              choices: [
+                {
+                  message: {
+                    content: '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]}}\n```',
+                  },
+                },
+              ],
+            },
+          });
+        });
+
+        // 设置非 deepseek-r1 模型
+        (analyzeService as any).API_MODEL = 'qwen-long';
+        (analyzeService as any).cache = new Map();
+
+        await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+      } finally {
+        axios.post = originalPost;
+      }
+    });
+
+    it('should only include max_tokens parameter for deepseek-r1 model', async () => {
+      // Replace require with import
+      const analyzeService = (await import('../../services/analyzeService')).default;
+
+      const originalPost = axios.post;
+
+      try {
+        axios.post = jest.fn().mockImplementation((url, data) => {
+          expect(data).toHaveProperty('model');
+          expect(data).toHaveProperty('messages');
+          expect(data).toHaveProperty('max_tokens');
+          expect(data).not.toHaveProperty('temperature');
+          expect(data).not.toHaveProperty('top_p');
+          expect(data).not.toHaveProperty('presence_penalty');
+
+          return Promise.resolve({
+            data: {
+              choices: [
+                {
+                  message: {
+                    content: '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]}}\n```',
+                  },
+                },
+              ],
+            },
+          });
+        });
+
+        (analyzeService as any).API_MODEL = 'deepseek-r1';
+        (analyzeService as any).cache = new Map();
+
+        await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+      } finally {
+        axios.post = originalPost;
+      }
     });
   });
 });

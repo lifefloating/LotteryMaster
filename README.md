@@ -19,26 +19,44 @@
 
 - **AI 模型**
   - [通义千问 Qwen API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告，趋势分析图表。
+  - [DeepSeek](https://help.aliyun.com/zh/model-studio/developer-reference/deepseek): 阿里云百炼平台提供的 DeepSeek 大语言模型，具有强大的推理和分析能力。
+  - deepseek的api比较慢，页面上使用不建议设置
+  
   
   #### API 参数说明
   
   `.env.example` 中的 API 相关参数说明：
   
   - **API_MODEL**: 选择使用的模型，可选值包括：
-    - `qwen-turbo`: 响应速度快，适合简单的分析任务
-    - `qwen-long`: 支持更长的上下文
-    - `qwen-max`: 功能最强大的模型，分析能力最佳
+    - `qwen-turbo`
+    - `qwen-long`
+    - `qwen-max`
+    - `deepseek-v3`
+    - `deepseek-r1`
   
   - **API_TEMPERATURE**: 控制输出的随机性，取值范围 0-1
     - 值越低（如 0.1）: 输出更确定、更保守，适合分析报告等需要准确性的场景
-    - 值越高（如 0.8）: 输出更多样、更创造性，适合创意内容生成
-  
+    - 值越高（如 0.7）: 输出更多样化、更创新，适合创意性内容生成
+    - 注意：`deepseek-r1` 模型不支持此参数设置
+
+  - **API_TOP_P**: 控制输出的多样性，取值范围 0-1
+    - 值越低：输出更加集中在高概率的词上
+    - 值越高：输出更多样化
+    - 推荐值：0.6
+    - 注意：`deepseek-r1` 模型不支持此参数设置
+
+  - **API_PRESENCE_PENALTY**: 控制重复内容的惩罚程度，取值范围 0-2
+    - 值越高：模型更倾向于生成新的内容而不是重复已有内容
+    - 推荐值：0.95
+    - 注意：`deepseek-r1` 模型不支持此参数设置
+
   - **API_MAX_TOKENS**: 限制模型返回的最大 Token 数量
     - 较大的值允许模型生成更详细的分析结果
     - 默认值为 3000，可根据需要调整
   
   - **API_TIMEOUT**: API 请求超时时间（毫秒）
     - 默认值为 120000（2分钟）
+    - deepseek-r1的超时时间可能要拉长
   
   更多详细参数说明请参考[通义千问 API 文档](https://help.aliyun.com/zh/model-studio/developer-reference/use-qwen-by-calling-api)
   

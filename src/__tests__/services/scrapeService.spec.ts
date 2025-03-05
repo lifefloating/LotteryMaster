@@ -119,7 +119,8 @@ describe('LotteryScraper', () => {
     (cheerio.load as jest.Mock).mockReturnValue(mockCheerioFunction);
 
     // Mock XLSX
-    (XLSX.utils.book_new as jest.Mock).mockReturnValue({});
+    const mockWorkbook = { Sheets: {}, SheetNames: [] };
+    (XLSX.utils.book_new as jest.Mock).mockReturnValue(mockWorkbook);
     (XLSX.utils.aoa_to_sheet as jest.Mock).mockReturnValue({});
     (XLSX.utils.book_append_sheet as jest.Mock).mockReturnValue(undefined);
     (XLSX.writeFile as jest.Mock).mockReturnValue(undefined);
@@ -152,7 +153,7 @@ describe('LotteryScraper', () => {
       jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
 
       // Mock file exists
-      (fs.existsSync as jest.Mock).mockReturnValueOnce(true).mockReturnValueOnce(true);
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(true);
 
       const result = await scraper.scrapeSSQ();
 
@@ -160,6 +161,9 @@ describe('LotteryScraper', () => {
       expect(result.isNewFile).toBe(false);
       expect(result.fileName).toBe(mockSSQFilename);
       expect(result.message).toContain('already exists');
+
+      // clear existsSync mock
+      (fs.existsSync as jest.Mock).mockClear();
     });
 
     it('should scrape and save SSQ data if file does not exist', async () => {
@@ -180,6 +184,8 @@ describe('LotteryScraper', () => {
       expect(result.success).toBe(true);
       expect(result.isNewFile).toBe(true);
       expect(result.fileName).toBe(mockSSQFilename);
+
+      (fs.existsSync as jest.Mock).mockClear();
     });
 
     it('should handle errors during SSQ scraping', async () => {
@@ -197,6 +203,96 @@ describe('LotteryScraper', () => {
       expect(result.success).toBe(false);
       expect(result.message).toContain('Failed to scrape SSQ data');
     });
+
+    it('should handle HTML parsing in scrapeSSQ', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
+      // Mock fs.readdirSync for deleteOldFiles
+      (fs.readdirSync as jest.Mock).mockReturnValue([]);
+
+      // Mock axios to return valid HTML
+      (axios.get as jest.Mock).mockResolvedValueOnce({
+        data: '<table><tr class="t_tr1"><td>2300-03-06</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td></tr></table>',
+        status: 200,
+      });
+
+      // Create a better cheerio mock
+      const mockCells = [
+        { text: jest.fn().mockReturnValue('2300-03-06') },
+        { text: jest.fn().mockReturnValue('01') },
+        { text: jest.fn().mockReturnValue('02') },
+        { text: jest.fn().mockReturnValue('03') },
+        { text: jest.fn().mockReturnValue('04') },
+        { text: jest.fn().mockReturnValue('05') },
+        { text: jest.fn().mockReturnValue('06') },
+        { text: jest.fn().mockReturnValue('07') },
+      ];
+
+      const mockElement = {
+        find: jest.fn().mockReturnValue(mockCells),
+      };
+
+      const mockEach = jest.fn().mockImplementation((callback) => {
+        callback(0, mockElement);
+      });
+
+      const mockCheerioFunction = function (selector: any): any {
+        if (selector === 'tr.t_tr1') {
+          return { each: mockEach };
+        } else if (selector === mockElement) {
+          return mockElement;
+        } else if (typeof selector === 'number') {
+          // If it's already a number, use it directly
+          const index = selector;
+          if (index >= 0 && index < mockCells.length) {
+            return mockCells[index];
+          }
+        } else if (typeof selector === 'string') {
+          // Only parse if it's a string
+          const index = parseInt(selector);
+          if (!isNaN(index) && index >= 0 && index < mockCells.length) {
+            return mockCells[index];
+          }
+        }
+        return { text: jest.fn().mockReturnValue('') };
+      };
+
+      // Add the find method to the function
+      mockCheerioFunction.find = jest.fn().mockReturnValue([]);
+
+      (cheerio.load as jest.Mock).mockReturnValue(mockCheerioFunction);
+
+      // Mock saveToExcel to avoid actual file operations
+      jest.spyOn(scraper as any, 'saveToExcel').mockResolvedValue(undefined);
+
+      // Mock XLSX functions properly
+      const mockDeleteOldFiles = jest
+        .spyOn(scraper as any, 'deleteOldFiles')
+        .mockImplementation(() => {});
+      const mockExistsSync = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
+      const result = await scraper.scrapeSSQ();
+
+      // The test should now pass with the correct mocking
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Successfully created new SSQ data file');
+
+      // Restore all mocks
+      mockDeleteOldFiles.mockRestore();
+      mockExistsSync.mockRestore();
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
+    });
   });
 
   describe('scrapeDLT', () => {
@@ -205,7 +301,7 @@ describe('LotteryScraper', () => {
       jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
 
       // Mock file exists
-      (fs.existsSync as jest.Mock).mockReturnValueOnce(true).mockReturnValueOnce(true);
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(true);
 
       const result = await scraper.scrapeDLT();
 
@@ -233,6 +329,8 @@ describe('LotteryScraper', () => {
       expect(result.success).toBe(true);
       expect(result.isNewFile).toBe(true);
       expect(result.fileName).toBe(mockDLTFilename);
+
+      (fs.existsSync as jest.Mock).mockClear();
     });
 
     it('should handle errors during DLT scraping', async () => {
@@ -250,6 +348,89 @@ describe('LotteryScraper', () => {
       expect(result.success).toBe(false);
       expect(result.message).toContain('Failed to scrape DLT data');
     });
+
+    it('should handle HTML parsing in scrapeDLT', async () => {
+      // Mock getDataDirPath to return our mockDataDir
+      jest.spyOn(scraper as any, 'getDataDirPath').mockReturnValue(mockDataDir);
+
+      // Mock axios to return valid HTML
+      (axios.get as jest.Mock).mockResolvedValueOnce({
+        data: '<table><tr class="t_tr1"><td>2300-03-06</td><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td><td>07</td></tr></table>',
+        status: 200,
+      });
+
+      // Create a better cheerio mock
+      const mockCells = [
+        { text: jest.fn().mockReturnValue('2300-03-06') },
+        { text: jest.fn().mockReturnValue('01') },
+        { text: jest.fn().mockReturnValue('02') },
+        { text: jest.fn().mockReturnValue('03') },
+        { text: jest.fn().mockReturnValue('04') },
+        { text: jest.fn().mockReturnValue('05') },
+        { text: jest.fn().mockReturnValue('06') },
+        { text: jest.fn().mockReturnValue('07') },
+      ];
+
+      const mockElement = {
+        find: jest.fn().mockReturnValue(mockCells),
+      };
+
+      const mockEach = jest.fn().mockImplementation((callback) => {
+        callback(0, mockElement);
+      });
+
+      const mockCheerioFunction = function (selector: any): any {
+        if (selector === 'tr.t_tr1') {
+          return { each: mockEach };
+        } else if (selector === mockElement) {
+          return mockElement;
+        } else if (typeof selector === 'number') {
+          // If it's already a number, use it directly
+          const index = selector;
+          if (index >= 0 && index < mockCells.length) {
+            return mockCells[index];
+          }
+        } else if (typeof selector === 'string') {
+          // Only parse if it's a string
+          const index = parseInt(selector);
+          if (!isNaN(index) && index >= 0 && index < mockCells.length) {
+            return mockCells[index];
+          }
+        }
+        return { text: jest.fn().mockReturnValue('') };
+      };
+
+      // Add the find method to the function
+      mockCheerioFunction.find = jest.fn().mockReturnValue([]);
+
+      (cheerio.load as jest.Mock).mockReturnValue(mockCheerioFunction);
+
+      // Mock saveToExcel to avoid actual file operations
+      jest.spyOn(scraper as any, 'saveToExcel').mockResolvedValue(undefined);
+
+      // Mock XLSX functions properly
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockExistsSync = jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
+      const result = await scraper.scrapeDLT();
+
+      // The test should now pass with the correct mocking
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Successfully created new DLT data file');
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockExistsSync.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
+    });
   });
 
   describe('saveToExcel', () => {
@@ -262,13 +443,31 @@ describe('LotteryScraper', () => {
         },
       ];
 
+      // Reset mocks before this test
+      jest.clearAllMocks();
+
+      // Make sure saveToExcel is not mocked
+      jest.spyOn(scraper as any, 'saveToExcel').mockRestore();
+
+      // Use jest.spyOn instead of direct assignment
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
       await (scraper as any).saveToExcel(mockData, 'test_data/ssq_data_test.xlsx');
 
-      expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalled();
-      expect(XLSX.writeFile).toHaveBeenCalledWith(
-        expect.anything(),
-        'test_data/ssq_data_test.xlsx'
-      );
+      expect(mockAoaToSheet).toHaveBeenCalled();
+      expect(mockWriteFile).toHaveBeenCalledWith(expect.anything(), 'test_data/ssq_data_test.xlsx');
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
     });
 
     it('should save DLT data to Excel with correct headers', async () => {
@@ -281,39 +480,181 @@ describe('LotteryScraper', () => {
         },
       ];
 
+      // Reset mocks before this test
+      jest.clearAllMocks();
+
+      // Make sure saveToExcel is not mocked
+      jest.spyOn(scraper as any, 'saveToExcel').mockRestore();
+
+      // Use jest.spyOn instead of direct assignment
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
       await (scraper as any).saveToExcel(mockData, 'test_data/dlt_data_test.xlsx');
 
-      expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalled();
-      expect(XLSX.writeFile).toHaveBeenCalledWith(
-        expect.anything(),
-        'test_data/dlt_data_test.xlsx'
-      );
+      expect(mockAoaToSheet).toHaveBeenCalled();
+      expect(mockWriteFile).toHaveBeenCalledWith(expect.anything(), 'test_data/dlt_data_test.xlsx');
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
     });
 
     it('should filter out invalid data entries', async () => {
       const mockData = [
         {
           date: '2024001',
-          numbers: [1, 2, 3, 4, 5, 6],
+          numbers: [1, 2, 3, 4, 5, 6], // Valid SSQ entry
           bonusNumber: 7,
         },
         {
           date: '2024002',
-          numbers: [], // Invalid: empty numbers
-          bonusNumber: 7,
+          numbers: [], // Invalid - empty numbers
+          bonusNumber: 8,
         },
         {
           date: '2024003',
-          numbers: [1, 2, 3, 4, 5, 6],
-          bonusNumber: 'not a number' as any, // Invalid: not a number
+          numbers: [1, 2, 3, 4, 5], // Invalid for SSQ - not enough numbers
+          bonusNumber: 9,
         },
       ];
+
+      // Reset mocks before this test
+      jest.clearAllMocks();
+
+      // Make sure saveToExcel is not mocked
+      jest.spyOn(scraper as any, 'saveToExcel').mockRestore();
+
+      // Use jest.spyOn instead of direct assignment
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
 
       await (scraper as any).saveToExcel(mockData, 'test_data/ssq_data_test.xlsx');
 
       // Expect only valid entries to be processed
-      expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalled();
-      expect(XLSX.writeFile).toHaveBeenCalled();
+      expect(mockAoaToSheet).toHaveBeenCalled();
+      expect(mockWriteFile).toHaveBeenCalled();
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
+    });
+
+    it('should handle invalid SSQ data entries', async () => {
+      const mockData = [
+        {
+          date: '2024001',
+          numbers: [1, 2, 3, 4, 5, 6], // Valid
+          bonusNumber: 7,
+        },
+        {
+          date: '2024002',
+          numbers: [1, 2, 3, 4, 5], // Invalid - not enough numbers
+          bonusNumber: 8,
+        },
+        {
+          date: '2024003',
+          numbers: [1, 2, 3, 4, 5, NaN], // Invalid - contains NaN
+          bonusNumber: 7,
+        },
+      ];
+
+      // Reset mocks before this test
+      jest.clearAllMocks();
+
+      // Make sure saveToExcel is not mocked
+      jest.spyOn(scraper as any, 'saveToExcel').mockRestore();
+
+      // Use jest.spyOn instead of direct assignment
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
+      // Mock the filename to include 'ssq'
+      const filename = 'test_data/ssq_data_test.xlsx';
+
+      await (scraper as any).saveToExcel(mockData, filename);
+
+      // Verify only valid entries are processed
+      expect(mockAoaToSheet).toHaveBeenCalled();
+      expect(mockBookAppendSheet).toHaveBeenCalled();
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
+    });
+
+    it('should handle invalid DLT data entries', async () => {
+      const mockData = [
+        {
+          date: '2024001',
+          numbers: [1, 2, 3, 4, 5],
+          bonusNumber: 6,
+          bonusNumber2: 7,
+        },
+        {
+          date: '2024002',
+          numbers: [1, 2, 3, 4], // Invalid - not enough numbers
+          bonusNumber: 6,
+          bonusNumber2: 7,
+        },
+        {
+          date: '2024003',
+          numbers: [1, 2, 3, 4, 5],
+          bonusNumber: NaN, // Invalid - NaN
+          bonusNumber2: 7,
+        },
+      ];
+
+      // Reset mocks before this test
+      jest.clearAllMocks();
+
+      // Make sure saveToExcel is not mocked
+      jest.spyOn(scraper as any, 'saveToExcel').mockRestore();
+
+      // Use jest.spyOn instead of direct assignment
+      const mockWorkbook = { Sheets: {}, SheetNames: [] };
+      const mockAoaToSheet = jest.spyOn(XLSX.utils, 'aoa_to_sheet').mockReturnValue({});
+      const mockBookNew = jest.spyOn(XLSX.utils, 'book_new').mockReturnValue(mockWorkbook);
+      const mockBookAppendSheet = jest
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+      const mockWriteFile = jest.spyOn(XLSX, 'writeFile').mockImplementation(() => {});
+
+      // Mock the filename to include 'dlt'
+      const filename = 'test_data/dlt_data_test.xlsx';
+
+      await (scraper as any).saveToExcel(mockData, filename);
+
+      // Verify only valid entries are processed
+      expect(mockAoaToSheet).toHaveBeenCalled();
+      expect(mockBookAppendSheet).toHaveBeenCalled();
+
+      // Restore all mocks
+      mockAoaToSheet.mockRestore();
+      mockBookNew.mockRestore();
+      mockBookAppendSheet.mockRestore();
+      mockWriteFile.mockRestore();
     });
   });
 });
