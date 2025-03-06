@@ -37,6 +37,7 @@ describe('Analyze Controller', () => {
       trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
       oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
       recommendations: [],
+      topRecommendation: { frontZone: [], backZone: [] },
       riskWarnings: [],
     },
   };

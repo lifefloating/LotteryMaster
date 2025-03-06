@@ -76,6 +76,11 @@ export interface AnalysisResult {
       backZone: number[];
     }>;
 
+    topRecommendation: {
+      frontZone: number[];
+      backZone: number[];
+    };
+
     // 风险提示
     riskWarnings: string[];
   };

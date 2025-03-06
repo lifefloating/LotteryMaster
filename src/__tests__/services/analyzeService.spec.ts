@@ -125,7 +125,7 @@ describe('AnalyzeService', () => {
             {
               message: {
                 content:
-                  '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]},"hotColdAnalysis":{"frontZone":{"hotNumbers":[],"coldNumbers":[],"risingNumbers":[]},"backZone":{"hotNumbers":[],"coldNumbers":[],"risingNumbers":[]}},"missingAnalysis":{"frontZone":{"maxMissingNumber":0,"missingTrend":"","warnings":[]},"backZone":{"missingStatus":"","warnings":[]}},"trendAnalysis":{"frontZoneFeatures":[],"backZoneFeatures":[],"keyTurningPoints":[]},"oddEvenAnalysis":{"frontZoneRatio":"","backZoneRatio":"","recommendedRatio":""},"recommendations":[],"riskWarnings":[]}\n```',
+                  '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]},"hotColdAnalysis":{"frontZone":{"hotNumbers":[],"coldNumbers":[],"risingNumbers":[]},"backZone":{"hotNumbers":[],"coldNumbers":[],"risingNumbers":[]}},"missingAnalysis":{"frontZone":{"maxMissingNumber":0,"missingTrend":"","warnings":[]},"backZone":{"missingStatus":"","warnings":[]}},"trendAnalysis":{"frontZoneFeatures":[],"backZoneFeatures":[],"keyTurningPoints":[]},"oddEvenAnalysis":{"frontZoneRatio":"","backZoneRatio":"","recommendedRatio":""},"recommendations":[],"topRecommendation":{"frontZone":[],"backZone":[]},"riskWarnings":[]}\n```',
               },
             },
           ],

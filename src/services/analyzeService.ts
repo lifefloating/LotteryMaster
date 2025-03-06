@@ -174,6 +174,7 @@ class AnalyzeService {
         trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
         oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
         recommendations: [],
+        topRecommendation: { frontZone: [], backZone: [] },
         riskWarnings: [],
       },
     };
