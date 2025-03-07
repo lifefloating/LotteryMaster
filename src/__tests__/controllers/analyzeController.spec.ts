@@ -106,7 +106,6 @@ describe('Analyze Controller', () => {
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         analysis: {
-          raw: mockAnalysisResult.rawContent,
           structured: mockAnalysisResult.structured,
         },
       });
@@ -128,7 +127,6 @@ describe('Analyze Controller', () => {
       expect(mockReply.send).toHaveBeenCalledWith({
         success: true,
         analysis: {
-          raw: mockAnalysisResult.rawContent,
           structured: mockAnalysisResult.structured,
         },
       });

@@ -19,7 +19,6 @@ export const analyzeSSQ = async (
     return reply.send({
       success: true,
       analysis: {
-        raw: analysis.rawContent,
         structured: analysis.structured,
       },
     });
@@ -50,7 +49,6 @@ export const analyzeDLT = async (
     return reply.send({
       success: true,
       analysis: {
-        raw: analysis.rawContent,
         structured: analysis.structured,
       },
     });

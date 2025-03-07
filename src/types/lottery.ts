@@ -72,13 +72,16 @@ export interface AnalysisResult {
 
     // 推荐号码
     recommendations: Array<{
+      strategy: string;
       frontZone: number[];
       backZone: number[];
+      rationale: string;
     }>;
 
     topRecommendation: {
       frontZone: number[];
       backZone: number[];
+      rationale: string;
     };
 
     // 风险提示
