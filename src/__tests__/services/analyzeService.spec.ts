@@ -19,10 +19,18 @@ jest.mock('axios', () => {
   return {
     default: {
       post: mockPost,
-      isAxiosError: jest.fn().mockImplementation(() => false),
+      isAxiosError: <T = any, D = any>(
+        payload: any
+      ): payload is import('axios').AxiosError<T, D> => {
+        // Check if the payload has the shape of an Axios error
+        return payload && payload.response !== undefined;
+      },
     },
     post: mockPost,
-    isAxiosError: jest.fn().mockImplementation(() => false),
+    isAxiosError: <T = any, D = any>(payload: any): payload is import('axios').AxiosError<T, D> => {
+      // Check if the payload has the shape of an Axios error
+      return payload && payload.response !== undefined;
+    },
   };
 });
 jest.mock('xlsx');
@@ -103,16 +111,22 @@ describe('AnalyzeService', () => {
       // Reset mocks to ensure clean state
       jest.clearAllMocks();
 
-      // 使用不同的方式模拟错误
+      // 重置 analyzeService 的缓存
+      (analyzeService as any).cache = new Map();
+
+      const networkError = new Error('Network error');
+      // 使用 mockImplementationOnce 确保错误被抛出
       (axios.post as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('Network error');
+        throw networkError;
       });
 
-      const result = await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
-
-      expect(result).toHaveProperty('structured');
-      expect(result.structured).toHaveProperty('frequencyAnalysis');
-      expect(result.structured.frequencyAnalysis).toEqual({ frontZone: [], backZone: [] });
+      try {
+        await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+        // 如果没有抛出错误，测试应该失败
+        expect('No error thrown').toBe('Error should have been thrown');
+      } catch (error) {
+        expect(error).toBe(networkError);
+      }
     });
 
     it('should handle invalid API responses', async () => {
@@ -191,6 +205,7 @@ describe('AnalyzeService', () => {
           expect(data).toHaveProperty('max_tokens');
           expect(data).toHaveProperty('top_p');
           expect(data).toHaveProperty('presence_penalty');
+          expect(data).not.toHaveProperty('stream');
 
           return Promise.resolve({
             data: {
@@ -229,6 +244,7 @@ describe('AnalyzeService', () => {
           expect(data).not.toHaveProperty('temperature');
           expect(data).not.toHaveProperty('top_p');
           expect(data).not.toHaveProperty('presence_penalty');
+          expect(data).not.toHaveProperty('stream');
 
           return Promise.resolve({
             data: {
@@ -249,6 +265,37 @@ describe('AnalyzeService', () => {
         await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
       } finally {
         axios.post = originalPost;
+      }
+    });
+
+    it('should handle Axios errors with detailed error information', async () => {
+      jest.clearAllMocks();
+      (analyzeService as any).cache = new Map();
+
+      // Create a mock Axios error with response data
+      const axiosError = new Error('API Error') as any;
+      axiosError.response = {
+        status: 400,
+        data: { error: { message: 'Invalid parameter' } },
+      };
+
+      // Mock axios.isAxiosError to return true for our error
+      const isAxiosErrorSpy = jest.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
+
+      (axios.post as jest.Mock).mockImplementationOnce(() => {
+        throw axiosError;
+      });
+
+      try {
+        await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+        // 如果没有抛出错误，测试应该失败
+        expect('No error thrown').toBe('Error should have been thrown');
+      } catch (error) {
+        expect(error).toBe(axiosError);
+        expect(isAxiosErrorSpy).toHaveBeenCalled();
+      } finally {
+        // Restore the original spy
+        isAxiosErrorSpy.mockRestore();
       }
     });
   });

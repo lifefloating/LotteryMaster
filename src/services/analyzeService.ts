@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
@@ -123,23 +123,29 @@ class AnalyzeService {
 
         return result;
       } catch (error) {
+        // Log basic error information for any error type
+        logger.error(
+          `API Request Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`
+        );
+
+        // Additional logging for Axios errors with their specific properties
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError;
-          logger.error('API Request Error:', {
-            status: axiosError.response?.status,
-            statusText: axiosError.response?.statusText,
-            data: axiosError.response?.data,
-            message: axiosError.message,
-            config: {
-              url: axiosError.config?.url,
-              method: axiosError.config?.method,
-              headers: axiosError.config?.headers,
-              data: JSON.stringify(axiosError.config?.data).substring(0, 500) + '...',
-            },
-          });
-        } else {
-          logger.error('Non-Axios Error during API request:', error);
+          logger.error(`API Response Data: ${JSON.stringify(error.response?.data || {})}`);
+
+          // Log request data if available
+          if (error.config?.data) {
+            const requestData = JSON.stringify(error.config.data);
+            logger.error(
+              `API Request Data: ${requestData.length > 500 ? requestData.substring(0, 500) + '...' : requestData}`
+            );
+          }
         }
+
+        // Log stack trace if available
+        if (error instanceof Error && error.stack) {
+          logger.error(`Error Stack: ${error.stack}`);
+        }
+
         throw error;
       }
     } catch (error) {
