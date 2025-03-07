@@ -5,7 +5,12 @@
 
 - 📊 **数据处理**:  抓取彩票数据，保存到Excel文件，支持抓取全部期数。
 - 🤖 **输出报告**:  集成通义千问大模型(Qwen-MAX)/（Qwen-Long），根据prompt生成分析报告，包括号码预测、号码推荐、号码趋势等。
-- 📱 **多端访问支持**:   支持Web、移动App等多平台访问，方便用户随时随地获取彩票分析信息。前端项目地址: [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp)
+- 📱 **多端访问支持**:   支持Web、移动App等多平台访问，方便用户随时随地获取彩票分析信息
+
+### 🔗 前端项目
+- 代码仓库：[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/lifefloating/LotteryMaster-Uniapp) 
+- 在线演示：[![Vercel](https://img.shields.io/badge/Vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://lottery-master.vercel.app/#/)
+
 
 ## 🛠️ 技术栈 (Tech Stack)
 
