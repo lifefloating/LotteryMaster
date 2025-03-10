@@ -245,8 +245,14 @@ describe('ChartService', () => {
     });
 
     it('should handle file not found error', async () => {
-      // Mock fs.existsSync to return false
+      // Reset mocks to ensure clean state
+      jest.clearAllMocks();
+
+      // Mock fs.existsSync to return false specifically for this test
       (fs.existsSync as jest.Mock).mockReturnValue(false);
+
+      // Ensure getDataFilePath returns a valid path that will be checked
+      jest.spyOn(chartService as any, 'getDataFilePath').mockReturnValue('/test/path/file.xlsx');
 
       // Expect the service to throw an error
       await expect(chartService.generateFrequencyChart('SSQ')).rejects.toThrow('文件不存在');

@@ -27,8 +27,10 @@ class AnalyzeService {
 
   private readonly cache: Map<string, CacheItem> = new Map();
 
-  private getCacheKey(filename: string, data: LotteryData[]): string {
-    return `${filename}_${JSON.stringify(data)}`;
+  // todo redis
+  private getCacheKey(filename: string): string {
+    // Just use the filename as the cache key for simplicity
+    return filename;
   }
 
   private isValidCache(cacheItem: CacheItem): boolean {
@@ -45,7 +47,7 @@ class AnalyzeService {
 
       logger.info(`Successfully loaded ${data.length} records from Excel file`);
 
-      const cacheKey = this.getCacheKey(filename, data);
+      const cacheKey = this.getCacheKey(filename);
       const cachedResult = this.cache.get(cacheKey);
       if (cachedResult && this.isValidCache(cachedResult)) {
         logger.info('Returning cached analysis result');
