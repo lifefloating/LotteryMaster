@@ -1,0 +1,693 @@
+openapi: 3.1.0
+info:
+  title: Lottery Master API
+  description: API for scraping, analyzing, and visualizing lottery data
+  version: 1.0.0
+  contact:
+    name: Lottery Master Support
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://api.lotterymaster.example.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Scrape
+    description: Endpoints for scraping lottery data
+  - name: Analyze
+    description: Endpoints for analyzing lottery data
+  - name: Chart
+    description: Endpoints for generating lottery data charts
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      description: Check if the API is running
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Welcome to the lottery API
+
+  /api/scrape/ssq:
+    get:
+      summary: Scrape SSQ lottery data
+      description: Scrape and save the latest SSQ lottery data
+      tags:
+        - Scrape
+      responses:
+        '200':
+          description: Scraping result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: SSQ data scraped successfully
+                  isNewFile:
+                    type: boolean
+                    example: true
+        '500':
+          $ref: '#/components/responses/Error500'
+
+  /api/scrape/dlt:
+    get:
+      summary: Scrape DLT lottery data
+      description: Scrape and save the latest DLT lottery data
+      tags:
+        - Scrape
+      responses:
+        '200':
+          description: Scraping result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: DLT data scraped successfully
+                  isNewFile:
+                    type: boolean
+                    example: true
+        '500':
+          $ref: '#/components/responses/Error500'
+
+  /api/analyze/ssq:
+    get:
+      summary: Analyze SSQ lottery data
+      description: Analyze the latest SSQ lottery data
+      tags:
+        - Analyze
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analysis:
+                    type: object
+                    properties:
+                      structured:
+                        type: object
+                        properties:
+                          frequencyAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: array
+                                description: 红球频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 7
+                                    frequency:
+                                      type: integer
+                                      example: 15
+                              backZone:
+                                type: array
+                                description: 蓝球频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 3
+                                    frequency:
+                                      type: integer
+                                      example: 8
+                          hotColdAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门红球号码
+                                    items:
+                                      type: integer
+                                    example: [7, 12, 18, 25]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门红球号码
+                                    items:
+                                      type: integer
+                                    example: [2, 9, 15, 30]
+                                  risingNumbers:
+                                    type: array
+                                    description: 上升趋势的红球号码
+                                    items:
+                                      type: integer
+                                    example: [5, 11, 22]
+                              backZone:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门蓝球号码
+                                    items:
+                                      type: integer
+                                    example: [3, 6, 10]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门蓝球号码
+                                    items:
+                                      type: integer
+                                    example: [1, 8, 15]
+                                  risingNumbers:
+                                    type: array
+                                    description: 上升趋势的蓝球号码
+                                    items:
+                                      type: integer
+                                    example: [4, 12]
+                          missingAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: object
+                                properties:
+                                  maxMissingNumber:
+                                    type: integer
+                                    description: 最大遗漏号码
+                                    example: 15
+                                  missingTrend:
+                                    type: string
+                                    description: 遗漏趋势
+                                    example: "上升"
+                                  warnings:
+                                    type: array
+                                    description: 遗漏警告
+                                    items:
+                                      type: string
+                                    example: ["号码15已遗漏超过20期"]
+                              backZone:
+                                type: object
+                                properties:
+                                  missingStatus:
+                                    type: string
+                                    description: 遗漏状态
+                                    example: "正常"
+                                  warnings:
+                                    type: array
+                                    description: 遗漏警告
+                                    items:
+                                      type: string
+                                    example: []
+                          trendAnalysis:
+                            type: object
+                            properties:
+                              frontZoneFeatures:
+                                type: array
+                                description: 红球区特征
+                                items:
+                                  type: string
+                                example: ["大号走强", "奇数占优"]
+                              backZoneFeatures:
+                                type: array
+                                description: 蓝球区特征
+                                items:
+                                  type: string
+                                example: ["小号走热"]
+                              keyTurningPoints:
+                                type: array
+                                description: 关键转折点
+                                items:
+                                  type: string
+                                example: ["第2022001期开始大号走强"]
+                          oddEvenAnalysis:
+                            type: object
+                            properties:
+                              frontZoneRatio:
+                                type: string
+                                description: 红球区奇偶比
+                                example: "4:2"
+                              backZoneRatio:
+                                type: string
+                                description: 蓝球区奇偶比
+                                example: "1:0"
+                              recommendedRatio:
+                                type: string
+                                description: 推荐奇偶比
+                                example: "3:3"
+                          recommendations:
+                            type: array
+                            description: 推荐号码组合
+                            items:
+                              type: object
+                              properties:
+                                strategy:
+                                  type: string
+                                  description: 推荐策略
+                                  example: "热号优先"
+                                frontZone:
+                                  type: array
+                                  description: 推荐红球
+                                  items:
+                                    type: integer
+                                  example: [3, 7, 12, 18, 25, 30]
+                                backZone:
+                                  type: array
+                                  description: 推荐蓝球
+                                  items:
+                                    type: integer
+                                  example: [6]
+                                rationale:
+                                  type: string
+                                  description: 推荐理由
+                                  example: "基于热号走势分析"
+                          topRecommendation:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: array
+                                description: 最优推荐红球
+                                items:
+                                  type: integer
+                                example: [3, 7, 12, 18, 25, 30]
+                              backZone:
+                                type: array
+                                description: 最优推荐蓝球
+                                items:
+                                  type: integer
+                                example: [6]
+                              rationale:
+                                type: string
+                                description: 推荐理由
+                                example: "综合分析各项指标的最优选择"
+                          riskWarnings:
+                            type: array
+                            description: 风险提示
+                            items:
+                              type: string
+                            example: ["彩票有风险，投注需谨慎"]
+        '500':
+          $ref: '#/components/responses/Error500'
+
+  /api/analyze/dlt:
+    get:
+      summary: Analyze DLT lottery data
+      description: Analyze the latest DLT lottery data
+      tags:
+        - Analyze
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analysis:
+                    type: object
+                    properties:
+                      structured:
+                        type: object
+                        properties:
+                          frequencyAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: array
+                                description: 前区号码频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 15
+                                    frequency:
+                                      type: integer
+                                      example: 12
+                              backZone:
+                                type: array
+                                description: 后区号码频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 5
+                                    frequency:
+                                      type: integer
+                                      example: 7
+                          hotColdAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门前区号码
+                                    items:
+                                      type: integer
+                                    example: [5, 12, 18, 25, 32]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门前区号码
+                                    items:
+                                      type: integer
+                                    example: [2, 9, 15, 27, 33]
+                                  risingNumbers:
+                                    type: array
+                                    description: 上升趋势的前区号码
+                                    items:
+                                      type: integer
+                                    example: [7, 14, 22, 29]
+                              backZone:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门后区号码
+                                    items:
+                                      type: integer
+                                    example: [3, 8]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门后区号码
+                                    items:
+                                      type: integer
+                                    example: [5, 10]
+                                  risingNumbers:
+                                    type: array
+                                    description: 上升趋势的后区号码
+                                    items:
+                                      type: integer
+                                    example: [2, 7]
+                          missingAnalysis:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: object
+                                properties:
+                                  maxMissingNumber:
+                                    type: integer
+                                    description: 最大遗漏号码
+                                    example: 27
+                                  missingTrend:
+                                    type: string
+                                    description: 遗漏趋势
+                                    example: "稳定"
+                                  warnings:
+                                    type: array
+                                    description: 遗漏警告
+                                    items:
+                                      type: string
+                                    example: ["号码27已遗漏超过15期"]
+                              backZone:
+                                type: object
+                                properties:
+                                  missingStatus:
+                                    type: string
+                                    description: 遗漏状态
+                                    example: "波动较大"
+                                  warnings:
+                                    type: array
+                                    description: 遗漏警告
+                                    items:
+                                      type: string
+                                    example: ["后区号码10遗漏期数较长"]
+                          trendAnalysis:
+                            type: object
+                            properties:
+                              frontZoneFeatures:
+                                type: array
+                                description: 前区特征
+                                items:
+                                  type: string
+                                example: ["中号区间活跃", "偶数走强"]
+                              backZoneFeatures:
+                                type: array
+                                description: 后区特征
+                                items:
+                                  type: string
+                                example: ["小号占优"]
+                              keyTurningPoints:
+                                type: array
+                                description: 关键转折点
+                                items:
+                                  type: string
+                                example: ["第22001期后区开始小号走热"]
+                          oddEvenAnalysis:
+                            type: object
+                            properties:
+                              frontZoneRatio:
+                                type: string
+                                description: 前区奇偶比
+                                example: "2:3"
+                              backZoneRatio:
+                                type: string
+                                description: 后区奇偶比
+                                example: "1:1"
+                              recommendedRatio:
+                                type: string
+                                description: 推荐奇偶比
+                                example: "3:2"
+                          recommendations:
+                            type: array
+                            description: 推荐号码组合
+                            items:
+                              type: object
+                              properties:
+                                strategy:
+                                  type: string
+                                  description: 推荐策略
+                                  example: "遗漏值回补"
+                                frontZone:
+                                  type: array
+                                  description: 推荐前区号码
+                                  items:
+                                    type: integer
+                                  example: [5, 12, 18, 27, 32]
+                                backZone:
+                                  type: array
+                                  description: 推荐后区号码
+                                  items:
+                                    type: integer
+                                  example: [3, 10]
+                                rationale:
+                                  type: string
+                                  description: 推荐理由
+                                  example: "基于遗漏值分析"
+                          topRecommendation:
+                            type: object
+                            properties:
+                              frontZone:
+                                type: array
+                                description: 最优推荐前区号码
+                                items:
+                                  type: integer
+                                example: [5, 12, 18, 27, 32]
+                              backZone:
+                                type: array
+                                description: 最优推荐后区号码
+                                items:
+                                  type: integer
+                                example: [3, 10]
+                              rationale:
+                                type: string
+                                description: 推荐理由
+                                example: "综合分析各项指标的最优选择"
+                          riskWarnings:
+                            type: array
+                            description: 风险提示
+                            items:
+                              type: string
+                            example: ["彩票有风险，投注需谨慎"]
+        '500':
+          $ref: '#/components/responses/Error500'
+
+  /api/chart/trend:
+    get:
+      summary: Get trend chart data
+      description: Get trend chart data for lottery numbers
+      tags:
+        - Chart
+      parameters:
+        - name: type
+          in: query
+          required: true
+          description: Lottery type
+          schema:
+            type: string
+            enum: [ssq, dlt]
+        - name: periodCount
+          in: query
+          required: false
+          description: Number of periods to analyze
+          schema:
+            type: integer
+            default: 100
+        - name: zoneType
+          in: query
+          required: false
+          description: Zone type (red or blue)
+          schema:
+            type: string
+            enum: [red, blue]
+            default: red
+        - name: includeChartData
+          in: query
+          required: false
+          description: Whether to include chart data in the response
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Trend chart data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    description: Trend chart data
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: Period count must be a positive number
+        '500':
+          $ref: '#/components/responses/Error500'
+
+  /api/chart/frequency:
+    get:
+      summary: Get frequency chart data
+      description: Get frequency chart data for lottery numbers
+      tags:
+        - Chart
+      parameters:
+        - name: type
+          in: query
+          required: true
+          description: Lottery type
+          schema:
+            type: string
+            enum: [ssq, dlt]
+        - name: periodCount
+          in: query
+          required: false
+          description: Number of periods to analyze
+          schema:
+            type: integer
+            default: 100
+        - name: zoneType
+          in: query
+          required: false
+          description: Zone type (red or blue)
+          schema:
+            type: string
+            enum: [red, blue]
+            default: red
+        - name: includeChartData
+          in: query
+          required: false
+          description: Whether to include chart data in the response
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Frequency chart data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    description: Frequency chart data
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: Period count must be a positive number
+        '500':
+          $ref: '#/components/responses/Error500'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: An error occurred
+            code:
+              type: integer
+              example: 500
+            path:
+              type: string
+              example: /api/analyze/ssq
+
+  responses:
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error' 
