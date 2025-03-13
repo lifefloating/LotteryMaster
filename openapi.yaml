@@ -95,6 +95,32 @@ paths:
         '500':
           $ref: '#/components/responses/Error500'
 
+  /api/scrape/fc3d:
+    get:
+      summary: Scrape FC3D lottery data
+      description: Scrape and save the latest 福彩3D lottery data
+      tags:
+        - Scrape
+      responses:
+        '200':
+          description: Scraping result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: FC3D data scraped successfully
+                  isNewFile:
+                    type: boolean
+                    example: true
+        '500':
+          $ref: '#/components/responses/Error500'
+
   /api/analyze/ssq:
     get:
       summary: Analyze SSQ lottery data
