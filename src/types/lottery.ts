@@ -1,3 +1,9 @@
+export enum LotteryType {
+  SSQ = 'ssq',
+  DLT = 'dlt',
+  FC3D = 'fc3d',
+}
+
 export interface LotteryData {
   date: string;
   numbers: number[];
@@ -6,7 +12,7 @@ export interface LotteryData {
 }
 
 export interface ScrapedData {
-  type: 'ssq' | 'dlt'; // ssq: 双色球, dlt: 大乐透
+  type: 'ssq' | 'dlt' | 'fc3d'; // ssq: 双色球, dlt: 大乐透, fc3d: 福彩3D
   data: LotteryData[];
 }
 

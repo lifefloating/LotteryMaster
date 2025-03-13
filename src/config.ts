@@ -8,6 +8,7 @@ interface Config {
   LOG_LEVEL: string;
   SSQ_BASE_URL: string;
   DLT_BASE_URL: string;
+  FC3D_BASE_URL: string;
   HISTORY_LIMIT: number;
   DATA_PATH: string;
   API_KEY: string;
@@ -21,6 +22,7 @@ interface Config {
   RECENT_DATA_COUNT: number;
   SSQ_FILE_PREFIX: string;
   DLT_FILE_PREFIX: string;
+  FC3D_FILE_PREFIX: string;
   CACHE_DURATION: number;
   CORS_ORIGINS: string[];
 }
@@ -31,6 +33,7 @@ const configDefault: Config = {
   LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
   SSQ_BASE_URL: process.env.SSQ_BASE_URL as string,
   DLT_BASE_URL: process.env.DLT_BASE_URL as string,
+  FC3D_BASE_URL: process.env.FC3D_BASE_URL as string,
   HISTORY_LIMIT: parseInt(process.env.HISTORY_LIMIT ?? '10000', 10),
   DATA_PATH: process.env.DATA_PATH ?? 'lottery_data',
   API_KEY: process.env.API_KEY as string,
@@ -44,6 +47,7 @@ const configDefault: Config = {
   RECENT_DATA_COUNT: parseInt(process.env.RECENT_DATA_COUNT ?? '20', 10),
   SSQ_FILE_PREFIX: process.env.SSQ_FILE_PREFIX ?? 'ssq_data_',
   DLT_FILE_PREFIX: process.env.DLT_FILE_PREFIX ?? 'dlt_data_',
+  FC3D_FILE_PREFIX: process.env.FC3D_FILE_PREFIX ?? 'fc3d_data_',
   CACHE_DURATION: parseInt(process.env.CACHE_DURATION ?? '3600000', 10),
   CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['*'],
 };
