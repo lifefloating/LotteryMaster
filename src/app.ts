@@ -1,5 +1,7 @@
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 import config from './config';
 import logger from './utils/logger';
 
@@ -13,6 +15,7 @@ logger.info('Environment variables loaded:', {
   PORT: config.PORT,
   SSQ_BASE_URL: config.SSQ_BASE_URL,
   DLT_BASE_URL: config.DLT_BASE_URL,
+  FC3D_BASE_URL: config.FC3D_BASE_URL,
   DATA_PATH: config.DATA_PATH,
   CORS_ORIGINS: config.CORS_ORIGINS,
 });
@@ -31,11 +34,19 @@ app.register(cors, {
   credentials: true,
 });
 
+// Register static file service
+app.register(fastifyStatic, {
+  root: path.join(__dirname, '../api'),
+  prefix: '/api/',
+  decorateReply: false,
+});
+
 // Define route handlers
 app.get('/api/health', healthController.healthCheck);
 
 app.get('/api/scrape/ssq', scrapeController.scrapeSSQ);
 app.get('/api/scrape/dlt', scrapeController.scrapeDLT);
+app.get('/api/scrape/fc3d', scrapeController.scrapeFC3D);
 
 app.get('/api/analyze/ssq', analyzeController.analyzeSSQ);
 app.get('/api/analyze/dlt', analyzeController.analyzeDLT);
@@ -114,6 +125,7 @@ const start = async (): Promise<void> => {
     logger.info('Scraping:');
     logger.info('  - GET /api/scrape/ssq');
     logger.info('  - GET /api/scrape/dlt');
+    logger.info('  - GET /api/scrape/fc3d');
     logger.info('Analysis:');
     logger.info('  - GET /api/analyze/ssq');
     logger.info('  - GET /api/analyze/dlt');

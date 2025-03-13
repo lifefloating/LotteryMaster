@@ -27,7 +27,7 @@ class AnalyzeService {
 
   private readonly cache: Map<string, CacheItem> = new Map();
 
-  // todo redis
+  // todo redis maybe not
   private getCacheKey(filename: string): string {
     // Just use the filename as the cache key for simplicity
     return filename;

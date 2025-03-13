@@ -24,3 +24,15 @@ export const scrapeDLT = async (
     isNewFile: result.isNewFile,
   });
 };
+
+export const scrapeFC3D = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> => {
+  const result = await scraper.scrapeFC3D();
+  return reply.send({
+    success: result.success,
+    message: result.message,
+    isNewFile: result.isNewFile,
+  });
+};
