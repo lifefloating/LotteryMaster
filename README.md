@@ -22,6 +22,7 @@
 <a href="https://getpino.io/"><img src="https://img.shields.io/badge/Pino-green?style=flat-square&logo=npm&logoColor=white" alt="Pino Badge"/></a>
 <a href="https://www.npmjs.com/package/xlsx"><img src="https://img.shields.io/badge/xlsx-lightgrey?style=flat-square&logo=npm&logoColor=red" alt="xlsx Badge"/></a>
 <a href="https://jestjs.io/"><img src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" alt="Jest Badge"/></a>
+<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker Badge"/></a>
 
 - **AI 模型**
   - [通义千问 Qwen API](https://tongyi.aliyun.com/qianwen/):  阿里云大语言模型API，用于生成分析报告，趋势分析图表。
