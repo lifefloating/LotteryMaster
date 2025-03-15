@@ -71,7 +71,7 @@
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
 
 - **测试覆盖率**
-- <a href="#"><img src="https://img.shields.io/badge/Coverage-91.3%25-success" alt="Coverage Badge"/></a>
+- <a href="#"><img src="https://img.shields.io/badge/Coverage-90.3%25-success" alt="Coverage Badge"/></a>
 
   **总体覆盖率指标**
 
