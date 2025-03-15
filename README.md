@@ -77,7 +77,7 @@
 
   | 指标 | 覆盖率 |
   |------|--------|
-  | Statements | 91.14% |
+  | Statements | 90.3% |
   | Branches | 78.97% |
   | Functions | 90.32% |
   | Lines | 91.3% |
