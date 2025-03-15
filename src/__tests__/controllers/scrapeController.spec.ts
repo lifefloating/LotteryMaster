@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { scrapeSSQ, scrapeDLT } from '../../controllers/scrapeController';
+import { scrapeSSQ, scrapeDLT, scrapeFC3D } from '../../controllers/scrapeController';
 import scraper from '../../services/scrapeService';
 
 // Mock scraper service
@@ -69,6 +69,31 @@ describe('Scrape Controller', () => {
       await scrapeDLT(mockRequest as FastifyRequest, mockReply as FastifyReply);
 
       expect(scraper.scrapeDLT).toHaveBeenCalled();
+      expect(mockReply.send).toHaveBeenCalledWith(errorResult);
+    });
+  });
+
+  describe('scrapeFC3D', () => {
+    it('should scrape FC3D data successfully', async () => {
+      (scraper.scrapeFC3D as jest.Mock).mockResolvedValue(mockScrapeResult);
+
+      await scrapeFC3D(mockRequest as FastifyRequest, mockReply as FastifyReply);
+
+      expect(scraper.scrapeFC3D).toHaveBeenCalled();
+      expect(mockReply.send).toHaveBeenCalledWith(mockScrapeResult);
+    });
+
+    it('should handle scraping errors', async () => {
+      const errorResult = {
+        success: false,
+        message: 'Failed to scrape FC3D data',
+        isNewFile: false,
+      };
+      (scraper.scrapeFC3D as jest.Mock).mockResolvedValue(errorResult);
+
+      await scrapeFC3D(mockRequest as FastifyRequest, mockReply as FastifyReply);
+
+      expect(scraper.scrapeFC3D).toHaveBeenCalled();
       expect(mockReply.send).toHaveBeenCalledWith(errorResult);
     });
   });
