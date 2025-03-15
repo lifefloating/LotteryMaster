@@ -5,175 +5,171 @@
       "frequencyAnalysis": {
         "frontZone": [
           {
+            "number": 3,
+            "frequency": 15
+          },
+          {
+            "number": 1,
+            "frequency": 14
+          },
+          {
             "number": 11,
-            "frequency": 7
+            "frequency": 13
           },
           {
-            "number": 18,
-            "frequency": 7
+            "number": 2,
+            "frequency": 12
           },
           {
-            "number": 16,
-            "frequency": 6
-          },
-          {
-            "number": 27,
-            "frequency": 6
-          },
-          {
-            "number": 7,
-            "frequency": 6
+            "number": 29,
+            "frequency": 12
           }
         ],
         "backZone": [
           {
+            "number": 10,
+            "frequency": 18
+          },
+          {
+            "number": 12,
+            "frequency": 16
+          },
+          {
             "number": 11,
-            "frequency": 7
-          },
-          {
-            "number": 14,
-            "frequency": 4
-          },
-          {
-            "number": 15,
-            "frequency": 4
+            "frequency": 15
           }
         ]
       },
       "hotColdAnalysis": {
         "frontZone": {
           "hotNumbers": [
+            3,
             11,
-            18,
-            16,
-            27,
-            7
+            29,
+            33,
+            35
           ],
           "coldNumbers": [
-            1,
-            19,
-            21,
-            23,
-            26
+            4,
+            5,
+            6
           ],
           "risingNumbers": [
-            10,
-            22,
-            28
+            1,
+            7,
+            14
           ]
         },
         "backZone": {
           "hotNumbers": [
+            10,
             11,
-            14,
-            15
+            12
           ],
           "coldNumbers": [
             1,
-            3,
-            12
+            2
           ],
           "risingNumbers": [
+            3,
             4,
-            2
+            5
           ]
         }
       },
       "missingAnalysis": {
         "frontZone": {
-          "maxMissingNumber": 1,
-          "missingTrend": "近期遗漏值波动较大，部分号码遗漏值接近临界点",
+          "maxMissingNumber": 3,
+          "missingTrend": "前区遗漏值持续走高，重点关注3、5、7",
           "warnings": [
-            "1号球遗漏值较高，需关注",
-            "19号球长期未出现"
+            "遗漏值超过10期需警惕",
+            "冷号3可能回补"
           ]
         },
         "backZone": {
-          "missingStatus": "当前遗漏状况较为分散，部分号码遗漏值较高",
+          "missingStatus": "后区遗漏值处于中等水平，关注号码4、5",
           "warnings": [
-            "1号球遗漏值异常高，需关注"
+            "号码4已连续8期未出，需特别留意"
           ]
         }
       },
       "trendAnalysis": {
         "frontZoneFeatures": [
-          "近期11、18号球频繁出现",
-          "27号球逐渐转热"
+          "前区尾数1、2、3活跃",
+          "奇数号码近期强势"
         ],
         "backZoneFeatures": [
-          "11号球持续热门"
+          "后区偶数号码集中出现",
+          "后区号码波动幅度增大"
         ],
         "keyTurningPoints": [
-          "近3期走势与近10期趋势相反，振幅较大"
+          "前区11号进入热态阶段",
+          "后区10号即将转冷"
         ]
       },
       "oddEvenAnalysis": {
-        "frontZoneRatio": "奇偶比接近1:1，略偏向偶数",
-        "backZoneRatio": "奇偶比接近1:1",
-        "recommendedRatio": "前区推荐奇偶比3:3，后区推荐奇偶比1:1"
+        "frontZoneRatio": "奇偶比3:2",
+        "backZoneRatio": "偶偶组合",
+        "recommendedRatio": "3:2"
       },
       "recommendations": [
         {
           "strategy": "频率优先",
           "frontZone": [
+            3,
             11,
-            18,
-            16,
-            27,
-            7,
-            10
+            29,
+            33,
+            35
           ],
           "backZone": [
-            11,
-            14
+            10,
+            12
           ],
           "rationale": "基于高频号码组合"
         },
         {
           "strategy": "冷热平衡",
           "frontZone": [
+            3,
             11,
-            18,
-            16,
-            1,
-            19,
-            27
+            29,
+            4,
+            7
           ],
           "backZone": [
-            11,
-            1
+            3,
+            4
           ],
           "rationale": "热号延续+冷号补位"
         },
         {
           "strategy": "趋势拐点",
           "frontZone": [
-            10,
-            22,
-            28,
-            11,
-            18,
-            7
+            1,
+            7,
+            14,
+            29,
+            33
           ],
           "backZone": [
             4,
-            2
+            5
           ],
           "rationale": "基于关键转折点选择"
         }
       ],
       "topRecommendation": {
         "frontZone": [
+          3,
           11,
-          18,
-          16,
-          27,
-          7,
-          10
+          29,
+          33,
+          35
         ],
         "backZone": [
-          11,
-          4
+          10,
+          12
         ],
         "rationale": "综合评分最高组合：1. 高频权重40% 2. 热号延续30% 3. 冷号补位20% 4. 奇偶平衡10%"
       },
