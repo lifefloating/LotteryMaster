@@ -557,6 +557,290 @@ paths:
         '500':
           $ref: '#/components/responses/Error500'
 
+  /api/analyze/fc3d:
+    get:
+      summary: Analyze FC3D lottery data
+      description: Analyze the latest 福彩3D lottery data
+      tags:
+        - Analyze
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  analysis:
+                    type: object
+                    properties:
+                      structured:
+                        type: object
+                        properties:
+                          frequencyAnalysis:
+                            type: object
+                            properties:
+                              hundredsPlace:
+                                type: array
+                                description: 百位号码频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 5
+                                    frequency:
+                                      type: integer
+                                      example: 12
+                              tensPlace:
+                                type: array
+                                description: 十位号码频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 3
+                                    frequency:
+                                      type: integer
+                                      example: 10
+                              onesPlace:
+                                type: array
+                                description: 个位号码频率分析
+                                items:
+                                  type: object
+                                  properties:
+                                    number:
+                                      type: integer
+                                      example: 7
+                                    frequency:
+                                      type: integer
+                                      example: 8
+                              sumValue:
+                                type: object
+                                properties:
+                                  mostFrequent:
+                                    type: array
+                                    description: 最常出现的和值
+                                    items:
+                                      type: integer
+                                    example: [15, 18, 21]
+                                  distribution:
+                                    type: string
+                                    description: 和值分布特征
+                                    example: "中等和值占优"
+                          hotColdAnalysis:
+                            type: object
+                            properties:
+                              hundredsPlace:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门百位号码
+                                    items:
+                                      type: integer
+                                    example: [2, 5, 8]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门百位号码
+                                    items:
+                                      type: integer
+                                    example: [0, 4, 9]
+                              tensPlace:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门十位号码
+                                    items:
+                                      type: integer
+                                    example: [1, 3, 7]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门十位号码
+                                    items:
+                                      type: integer
+                                    example: [2, 6, 9]
+                              onesPlace:
+                                type: object
+                                properties:
+                                  hotNumbers:
+                                    type: array
+                                    description: 热门个位号码
+                                    items:
+                                      type: integer
+                                    example: [0, 5, 7]
+                                  coldNumbers:
+                                    type: array
+                                    description: 冷门个位号码
+                                    items:
+                                      type: integer
+                                    example: [3, 6, 8]
+                          missingAnalysis:
+                            type: object
+                            properties:
+                              hundredsPlace:
+                                type: object
+                                properties:
+                                  maxMissingNumber:
+                                    type: integer
+                                    description: 百位最大遗漏号码
+                                    example: 4
+                                  missingTrend:
+                                    type: string
+                                    description: 百位遗漏趋势
+                                    example: "稳定"
+                              tensPlace:
+                                type: object
+                                properties:
+                                  maxMissingNumber:
+                                    type: integer
+                                    description: 十位最大遗漏号码
+                                    example: 9
+                                  missingTrend:
+                                    type: string
+                                    description: 十位遗漏趋势
+                                    example: "波动较大"
+                              onesPlace:
+                                type: object
+                                properties:
+                                  maxMissingNumber:
+                                    type: integer
+                                    description: 个位最大遗漏号码
+                                    example: 6
+                                  missingTrend:
+                                    type: string
+                                    description: 个位遗漏趋势
+                                    example: "上升"
+                          spanAnalysis:
+                            type: object
+                            properties:
+                              currentSpan:
+                                type: integer
+                                description: 当前跨度值
+                                example: 7
+                              spanTrend:
+                                type: string
+                                description: 跨度走势
+                                example: "中等跨度占优"
+                              recommendedSpan:
+                                type: array
+                                description: 推荐跨度值
+                                items:
+                                  type: integer
+                                example: [5, 7, 9]
+                          oddEvenAnalysis:
+                            type: object
+                            properties:
+                              currentRatio:
+                                type: string
+                                description: 当前奇偶比
+                                example: "2:1"
+                              ratioTrend:
+                                type: string
+                                description: 奇偶比走势
+                                example: "奇数占优"
+                              recommendedRatio:
+                                type: string
+                                description: 推荐奇偶比
+                                example: "2:1"
+                          groupAnalysis:
+                            type: object
+                            properties:
+                              groupDistribution:
+                                type: object
+                                properties:
+                                  group6:
+                                    type: string
+                                    description: 组六出现频率
+                                    example: "65%"
+                                  group3:
+                                    type: string
+                                    description: 组三出现频率
+                                    example: "35%"
+                                  groupTrend:
+                                    type: string
+                                    description: 组选形态走势
+                                    example: "组六走强"
+                              currentPattern:
+                                type: string
+                                description: 当前形态分析
+                                example: "组六形态连续出现"
+                          recommendations:
+                            type: array
+                            description: 推荐号码组合
+                            items:
+                              type: object
+                              properties:
+                                strategy:
+                                  type: string
+                                  description: 推荐策略
+                                  example: "直选推荐"
+                                numbers:
+                                  type: array
+                                  description: 推荐号码
+                                  items:
+                                    type: integer
+                                  example: [5, 3, 7]
+                                type:
+                                  type: string
+                                  description: 组选类型
+                                  example: "组六"
+                                sumValue:
+                                  type: integer
+                                  description: 和值
+                                  example: 15
+                                possibleNumbers:
+                                  type: array
+                                  description: 可能的号码组合
+                                  items:
+                                    type: array
+                                    items:
+                                      type: integer
+                                  example: [[5, 3, 7], [5, 7, 3], [3, 5, 7]]
+                                rationale:
+                                  type: string
+                                  description: 推荐理由
+                                  example: "基于热号分析"
+                          topRecommendation:
+                            type: object
+                            properties:
+                              directSelection:
+                                type: array
+                                description: 直选推荐
+                                items:
+                                  type: integer
+                                example: [5, 3, 7]
+                              groupSelection:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    description: 组选类型
+                                    example: "组六"
+                                  numbers:
+                                    type: array
+                                    description: 组选号码
+                                    items:
+                                      type: integer
+                                    example: [3, 5, 7]
+                              rationale:
+                                type: string
+                                description: 推荐理由
+                                example: "综合分析各项指标的最优选择"
+                          riskWarnings:
+                            type: array
+                            description: 风险提示
+                            items:
+                              type: string
+                            example: ["彩票有风险，投注需谨慎"]
+        '500':
+          $ref: '#/components/responses/Error500'
+
   /api/chart/trend:
     get:
       summary: Get trend chart data
