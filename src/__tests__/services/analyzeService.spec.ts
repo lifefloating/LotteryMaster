@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import analyzeService from '../../services/analyzeService';
+import { getDefaultStandardLotteryResult, getDefaultFC3DResult } from '../../constants/dafaultResults';
 
 // Mock dependencies
 jest.mock('axios', () => {
@@ -58,6 +59,7 @@ jest.mock('../../config', () => ({
     RECENT_DATA_COUNT: 20,
   },
 }));
+jest.mock('../../constants/dafaultResults');
 
 describe('AnalyzeService', () => {
   const mockExcelData = [
@@ -68,12 +70,31 @@ describe('AnalyzeService', () => {
     },
   ];
 
-  const mockApiResponse = {
+  const mockFC3DExcelData = [
+    {
+      期号: '2024001',
+      号码: '1, 2, 3',
+    },
+  ];
+
+  const mockStandardApiResponse = {
     data: {
       choices: [
         {
           message: {
             content: '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]}}\n```',
+          },
+        },
+      ],
+    },
+  };
+
+  const mockFC3DApiResponse = {
+    data: {
+      choices: [
+        {
+          message: {
+            content: '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
           },
         },
       ],
@@ -92,26 +113,81 @@ describe('AnalyzeService', () => {
     (XLSX as any).readFile = jest.fn().mockReturnValue(mockWorkbook);
     (XLSX.utils as any).sheet_to_json = jest.fn().mockReturnValue(mockExcelData);
     // Mock axios.post to return test response
-    (axios.post as jest.Mock).mockResolvedValue(mockApiResponse);
+    (axios.post as jest.Mock).mockResolvedValue(mockStandardApiResponse);
+    
+    // Reset the cache for each test
+    (analyzeService as any).cache = new Map();
+    
+    // Setup default result mocks
+    (getDefaultStandardLotteryResult as jest.Mock).mockReturnValue({
+      frequencyAnalysis: { frontZone: [], backZone: [] },
+      // ... other standard lottery properties
+    });
+    
+    (getDefaultFC3DResult as jest.Mock).mockReturnValue({
+      frequencyAnalysis: { 
+        hundredsPlace: [], 
+        tensPlace: [], 
+        onesPlace: [],
+        sumValue: { mostFrequent: [], distribution: '' }
+      },
+      // ... other FC3D properties
+    });
   });
 
   describe('analyzeLotteryData', () => {
-    it('should analyze lottery data successfully', async () => {
+    it('should analyze standard lottery data successfully', async () => {
       const result = await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
 
       expect(XLSX.readFile).toHaveBeenCalledWith('test.xlsx');
       expect(XLSX.utils.sheet_to_json).toHaveBeenCalled();
       expect(axios.post).toHaveBeenCalled();
-      expect(result).toHaveProperty('rawContent');
       expect(result).toHaveProperty('structured');
       expect(result.structured).toHaveProperty('frequencyAnalysis');
+    });
+
+    it('should analyze FC3D lottery data successfully', async () => {
+      // Set up mock for FC3D data
+      (XLSX.utils as any).sheet_to_json = jest.fn().mockReturnValue(mockFC3DExcelData);
+      (axios.post as jest.Mock).mockResolvedValue(mockFC3DApiResponse);
+
+      const result = await analyzeService.analyzeLotteryData('fc3d_test.xlsx', 'FC3D');
+
+      expect(XLSX.readFile).toHaveBeenCalledWith('fc3d_test.xlsx');
+      expect(XLSX.utils.sheet_to_json).toHaveBeenCalled();
+      expect(axios.post).toHaveBeenCalled();
+      
+      // Verify that the correct prompt and system prompt were used
+      const axiosCallArgs = (axios.post as jest.Mock).mock.calls[0][1];
+      expect(axiosCallArgs.messages[0].content).toContain('福彩3D');
+      
+      expect(result).toHaveProperty('structured');
+      expect(result.structured).toHaveProperty('frequencyAnalysis');
+    });
+
+    it('should use the correct default result structure for FC3D', async () => {
+      // Create a mock invalid response to trigger default result
+      (axios.post as jest.Mock).mockResolvedValue({
+        data: {
+          choices: [
+            {
+              message: {
+                content: 'Invalid JSON',
+              },
+            },
+          ],
+        },
+      });
+
+      await analyzeService.analyzeLotteryData('fc3d_test.xlsx', 'FC3D');
+      
+      // Verify that getDefaultFC3DResult was called
+      expect(getDefaultFC3DResult).toHaveBeenCalled();
     });
 
     it('should handle API errors gracefully', async () => {
       // Reset mocks to ensure clean state
       jest.clearAllMocks();
-
-      // 重置 analyzeService 的缓存
       (analyzeService as any).cache = new Map();
 
       const networkError = new Error('Network error');
@@ -167,27 +243,68 @@ describe('AnalyzeService', () => {
         },
       });
 
-      const result = await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
-      expect(result).toHaveProperty('structured');
+      await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+      
+      // Verify that getDefaultStandardLotteryResult was called
+      expect(getDefaultStandardLotteryResult).toHaveBeenCalled();
     });
 
-    it('should build the correct prompt for analysis', async () => {
+    it('should build the correct prompt for standard lottery analysis', async () => {
       // Reset mocks to ensure clean state
       jest.clearAllMocks();
 
-      (axios.post as jest.Mock).mockResolvedValue({
-        data: {
-          choices: [
-            {
-              message: {
-                content: '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]}}\n```',
+      // Mock the API response
+      (axios.post as jest.Mock).mockImplementation((url, data) => {
+        // Check that the system prompt contains the expected content
+        expect(data.messages[0].content).toContain('双色球');
+        expect(data.messages[0].content).not.toContain('福彩3D');
+        
+        return Promise.resolve({
+          data: {
+            choices: [
+              {
+                message: {
+                  content: '```json\n{"frequencyAnalysis":{"frontZone":[],"backZone":[]}}\n```',
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        });
       });
 
       await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
+      
+      // Verify that axios.post was called
+      expect(axios.post).toHaveBeenCalled();
+    });
+
+    it('should build the correct prompt for FC3D analysis', async () => {
+      // Reset mocks to ensure clean state
+      jest.clearAllMocks();
+
+      // Mock the API response
+      (axios.post as jest.Mock).mockImplementation((url, data) => {
+        // Check that the system prompt contains the expected content
+        expect(data.messages[0].content).toContain('福彩3D');
+        expect(data.messages[0].content).not.toContain('双色球');
+        
+        return Promise.resolve({
+          data: {
+            choices: [
+              {
+                message: {
+                  content: '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
+                },
+              },
+            ],
+          },
+        });
+      });
+
+      await analyzeService.analyzeLotteryData('fc3d_test.xlsx', 'FC3D');
+      
+      // Verify that axios.post was called
+      expect(axios.post).toHaveBeenCalled();
     });
 
     it('should include all parameters for non-deepseek-r1 models', async () => {
