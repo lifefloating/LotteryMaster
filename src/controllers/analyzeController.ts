@@ -61,3 +61,32 @@ export const analyzeDLT = async (
     });
   }
 };
+
+export const analyzeFC3D = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<FastifyReply> => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const fileName = path.join(
+      __dirname,
+      '..',
+      config.DATA_PATH,
+      `${config.FC3D_FILE_PREFIX}${today}.xlsx`
+    );
+    const analysis = await analyzeService.analyzeLotteryData(fileName, 'FC3D');
+    return reply.send({
+      success: true,
+      analysis: {
+        structured: analysis.structured,
+      },
+    });
+  } catch (error) {
+    return reply.status(500).send({
+      success: false,
+      error: {
+        message: (error as Error).message,
+      },
+    });
+  }
+};

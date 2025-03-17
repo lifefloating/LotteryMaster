@@ -50,6 +50,7 @@ app.get('/api/scrape/fc3d', scrapeController.scrapeFC3D);
 
 app.get('/api/analyze/ssq', analyzeController.analyzeSSQ);
 app.get('/api/analyze/dlt', analyzeController.analyzeDLT);
+app.get('/api/analyze/fc3d', analyzeController.analyzeFC3D);
 
 // Chart routes
 app.get<{
@@ -129,6 +130,7 @@ const start = async (): Promise<void> => {
     logger.info('Analysis:');
     logger.info('  - GET /api/analyze/ssq');
     logger.info('  - GET /api/analyze/dlt');
+    logger.info('  - GET /api/analyze/fc3d');
     logger.info('Charts:');
     logger.info(
       '  - GET /api/chart/trend?type=ssq|dlt&periodCount=100&zoneType=red|blue&includeChartData=true|false'

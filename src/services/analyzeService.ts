@@ -2,7 +2,12 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
-import { STRUCTURED_ANALYSIS_TEMPLATE, STRUCTURED_SYSTEM_PROMPT } from '../prompt/prompts';
+import {
+  STRUCTURED_ANALYSIS_TEMPLATE,
+  STRUCTURED_SYSTEM_PROMPT,
+  FC3D_STRUCTURED_ANALYSIS_TEMPLATE,
+  FC3D_SYSTEM_PROMPT,
+} from '../prompt/prompts';
 import config from '../config';
 import { createLogger } from '../utils/logger';
 
@@ -37,7 +42,10 @@ class AnalyzeService {
     return Date.now() - cacheItem.createdAt < this.CACHE_DURATION;
   }
 
-  async analyzeLotteryData(filename: string, type: 'SSQ' | 'DLT'): Promise<AnalysisResult> {
+  async analyzeLotteryData(
+    filename: string,
+    type: 'SSQ' | 'DLT' | 'FC3D'
+  ): Promise<AnalysisResult> {
     try {
       logger.info(`Starting lottery data analysis for file: ${filename}`);
 
@@ -54,8 +62,18 @@ class AnalyzeService {
         return cachedResult.data;
       }
 
-      const prompt = this.buildStructuredAnalysisPrompt(data);
-      logger.info('Built structured analysis prompt, sending request to AI service...');
+      let prompt;
+      let systemPrompt;
+
+      if (type === 'FC3D') {
+        prompt = this.buildFC3DAnalysisPrompt(data);
+        systemPrompt = `${FC3D_SYSTEM_PROMPT}\n\n当前分析的是福彩3D数据，请严格按照对应的号码规则进行分析。`;
+      } else {
+        prompt = this.buildStructuredAnalysisPrompt(data);
+        systemPrompt = `${STRUCTURED_SYSTEM_PROMPT}\n\n当前分析的是${type === 'SSQ' ? '双色球' : '大乐透'}数据，请严格按照对应的号码规则进行分析。`;
+      }
+
+      logger.info('Built analysis prompt, sending request to AI service...');
 
       try {
         const requestBody: any = {
@@ -63,7 +81,7 @@ class AnalyzeService {
           messages: [
             {
               role: 'system',
-              content: `${STRUCTURED_SYSTEM_PROMPT}\n\n当前分析的是${type === 'SSQ' ? '双色球' : '大乐透'}数据，请严格按照对应的号码规则进行分析。`,
+              content: systemPrompt,
             },
             {
               role: 'user',
@@ -108,7 +126,7 @@ class AnalyzeService {
         logger.info('Raw content from AI service:', rawContent.substring(0, 100) + '...');
 
         // 解析结构化数据
-        const result = this.parseStructuredResponse(rawContent);
+        const result = this.parseStructuredResponse(rawContent, type);
 
         // 验证解析结果
         if (!result.structured || Object.keys(result.structured).length === 0) {
@@ -157,35 +175,75 @@ class AnalyzeService {
   }
 
   // 解析AI返回的结构化响应
-  private parseStructuredResponse(rawContent: string): AnalysisResult {
+  private parseStructuredResponse(
+    rawContent: string,
+    type: 'SSQ' | 'DLT' | 'FC3D'
+  ): AnalysisResult {
     // 默认结果结构
-    const defaultResult: AnalysisResult = {
-      rawContent,
-      structured: {
-        frequencyAnalysis: { frontZone: [], backZone: [] },
-        hotColdAnalysis: {
-          frontZone: {
-            hotNumbers: [],
-            coldNumbers: [],
-            risingNumbers: [],
+    let defaultResult: AnalysisResult;
+
+    if (type === 'FC3D') {
+      defaultResult = {
+        structured: {
+          frequencyAnalysis: {
+            hundredsPlace: [],
+            tensPlace: [],
+            onesPlace: [],
+            sumValue: { mostFrequent: [], distribution: '' },
           },
-          backZone: {
-            hotNumbers: [],
-            coldNumbers: [],
-            risingNumbers: [],
+          hotColdAnalysis: {
+            hundredsPlace: { hotNumbers: [], coldNumbers: [] },
+            tensPlace: { hotNumbers: [], coldNumbers: [] },
+            onesPlace: { hotNumbers: [], coldNumbers: [] },
           },
+          missingAnalysis: {
+            hundredsPlace: { maxMissingNumber: 0, missingTrend: '' },
+            tensPlace: { maxMissingNumber: 0, missingTrend: '' },
+            onesPlace: { maxMissingNumber: 0, missingTrend: '' },
+          },
+          spanAnalysis: { currentSpan: 0, spanTrend: '', recommendedSpan: [] },
+          oddEvenAnalysis: { currentRatio: '', ratioTrend: '', recommendedRatio: '' },
+          groupAnalysis: {
+            groupDistribution: { group6: '', group3: '', groupTrend: '' },
+            currentPattern: '',
+          },
+          recommendations: [],
+          topRecommendation: {
+            directSelection: [],
+            groupSelection: { type: '', numbers: [] },
+            rationale: '',
+          },
+          riskWarnings: [],
         },
-        missingAnalysis: {
-          frontZone: { maxMissingNumber: 0, missingTrend: '', warnings: [] },
-          backZone: { missingStatus: '', warnings: [] },
+      };
+    } else {
+      defaultResult = {
+        structured: {
+          frequencyAnalysis: { frontZone: [], backZone: [] },
+          hotColdAnalysis: {
+            frontZone: {
+              hotNumbers: [],
+              coldNumbers: [],
+              risingNumbers: [],
+            },
+            backZone: {
+              hotNumbers: [],
+              coldNumbers: [],
+              risingNumbers: [],
+            },
+          },
+          missingAnalysis: {
+            frontZone: { maxMissingNumber: 0, missingTrend: '', warnings: [] },
+            backZone: { missingStatus: '', warnings: [] },
+          },
+          trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
+          oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
+          recommendations: [],
+          topRecommendation: { frontZone: [], backZone: [], rationale: '' },
+          riskWarnings: [],
         },
-        trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
-        oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
-        recommendations: [],
-        topRecommendation: { frontZone: [], backZone: [], rationale: '' },
-        riskWarnings: [],
-      },
-    };
+      };
+    }
 
     try {
       logger.info('Parsing structured response from AI');
@@ -222,6 +280,26 @@ class AnalyzeService {
       return STRUCTURED_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
     } catch (error) {
       logger.error('Error building structured analysis prompt:', {
+        error,
+        dataLength: data?.length,
+      });
+      throw error;
+    }
+  }
+
+  // 构建FC3D分析提示
+  private buildFC3DAnalysisPrompt(data: LotteryData[]): string {
+    try {
+      const recentCount = config.RECENT_DATA_COUNT;
+      const recentData = data.slice(0, recentCount);
+      logger.info(`Building FC3D prompt with ${recentData.length} recent records`);
+
+      return FC3D_STRUCTURED_ANALYSIS_TEMPLATE.replace(
+        '${data}',
+        JSON.stringify(recentData, null, 2)
+      );
+    } catch (error) {
+      logger.error('Error building FC3D analysis prompt:', {
         error,
         dataLength: data?.length,
       });
