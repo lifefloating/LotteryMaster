@@ -8,6 +8,7 @@ import {
   FC3D_STRUCTURED_ANALYSIS_TEMPLATE,
   FC3D_SYSTEM_PROMPT,
 } from '../prompt/prompts';
+import { getDefaultStandardLotteryResult, getDefaultFC3DResult } from '../constants/dafaultResults';
 import config from '../config';
 import { createLogger } from '../utils/logger';
 
@@ -179,71 +180,10 @@ class AnalyzeService {
     rawContent: string,
     type: 'SSQ' | 'DLT' | 'FC3D'
   ): AnalysisResult {
-    // 默认结果结构
-    let defaultResult: AnalysisResult;
-
-    if (type === 'FC3D') {
-      defaultResult = {
-        structured: {
-          frequencyAnalysis: {
-            hundredsPlace: [],
-            tensPlace: [],
-            onesPlace: [],
-            sumValue: { mostFrequent: [], distribution: '' },
-          },
-          hotColdAnalysis: {
-            hundredsPlace: { hotNumbers: [], coldNumbers: [] },
-            tensPlace: { hotNumbers: [], coldNumbers: [] },
-            onesPlace: { hotNumbers: [], coldNumbers: [] },
-          },
-          missingAnalysis: {
-            hundredsPlace: { maxMissingNumber: 0, missingTrend: '' },
-            tensPlace: { maxMissingNumber: 0, missingTrend: '' },
-            onesPlace: { maxMissingNumber: 0, missingTrend: '' },
-          },
-          spanAnalysis: { currentSpan: 0, spanTrend: '', recommendedSpan: [] },
-          oddEvenAnalysis: { currentRatio: '', ratioTrend: '', recommendedRatio: '' },
-          groupAnalysis: {
-            groupDistribution: { group6: '', group3: '', groupTrend: '' },
-            currentPattern: '',
-          },
-          recommendations: [],
-          topRecommendation: {
-            directSelection: [],
-            groupSelection: { type: '', numbers: [] },
-            rationale: '',
-          },
-          riskWarnings: [],
-        },
-      };
-    } else {
-      defaultResult = {
-        structured: {
-          frequencyAnalysis: { frontZone: [], backZone: [] },
-          hotColdAnalysis: {
-            frontZone: {
-              hotNumbers: [],
-              coldNumbers: [],
-              risingNumbers: [],
-            },
-            backZone: {
-              hotNumbers: [],
-              coldNumbers: [],
-              risingNumbers: [],
-            },
-          },
-          missingAnalysis: {
-            frontZone: { maxMissingNumber: 0, missingTrend: '', warnings: [] },
-            backZone: { missingStatus: '', warnings: [] },
-          },
-          trendAnalysis: { frontZoneFeatures: [], backZoneFeatures: [], keyTurningPoints: [] },
-          oddEvenAnalysis: { frontZoneRatio: '', backZoneRatio: '', recommendedRatio: '' },
-          recommendations: [],
-          topRecommendation: { frontZone: [], backZone: [], rationale: '' },
-          riskWarnings: [],
-        },
-      };
-    }
+    // 使用默认结果结构
+    const defaultResult: AnalysisResult = {
+      structured: type === 'FC3D' ? getDefaultFC3DResult() : getDefaultStandardLotteryResult(),
+    };
 
     try {
       logger.info('Parsing structured response from AI');
@@ -255,7 +195,6 @@ class AnalyzeService {
         try {
           const jsonData = JSON.parse(jsonMatch[1]);
           return {
-            ...defaultResult,
             structured: jsonData,
           };
         } catch (jsonError) {
