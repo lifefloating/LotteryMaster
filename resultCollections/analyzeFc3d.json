@@ -1,0 +1,194 @@
+{
+    "success": true,
+    "analysis": {
+      "structured": {
+        "frequencyAnalysis": {
+          "hundredsPlace": [
+            {
+              "number": 5,
+              "frequency": 12
+            },
+            {
+              "number": 9,
+              "frequency": 11
+            },
+            {
+              "number": 7,
+              "frequency": 9
+            }
+          ],
+          "tensPlace": [
+            {
+              "number": 8,
+              "frequency": 13
+            },
+            {
+              "number": 6,
+              "frequency": 12
+            },
+            {
+              "number": 7,
+              "frequency": 9
+            }
+          ],
+          "onesPlace": [
+            {
+              "number": 6,
+              "frequency": 12
+            },
+            {
+              "number": 8,
+              "frequency": 11
+            },
+            {
+              "number": 4,
+              "frequency": 9
+            }
+          ],
+          "sumValue": {
+            "mostFrequent": [
+              16
+            ],
+            "distribution": "和值分布呈现正态分布特征，集中于12-18区间，16出现频率最高。"
+          }
+        },
+        "hotColdAnalysis": {
+          "hundredsPlace": {
+            "hotNumbers": [
+              5,
+              9,
+              7
+            ],
+            "coldNumbers": [
+              0,
+              1,
+              2
+            ]
+          },
+          "tensPlace": {
+            "hotNumbers": [
+              8,
+              6,
+              7
+            ],
+            "coldNumbers": [
+              3,
+              4,
+              5
+            ]
+          },
+          "onesPlace": {
+            "hotNumbers": [
+              6,
+              8,
+              4
+            ],
+            "coldNumbers": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        "missingAnalysis": {
+          "hundredsPlace": {
+            "maxMissingNumber": 0,
+            "missingTrend": "百位遗漏值波动较大，近期冷号0可能回补。"
+          },
+          "tensPlace": {
+            "maxMissingNumber": 3,
+            "missingTrend": "十位遗漏值趋于平稳，冷号3需关注。"
+          },
+          "onesPlace": {
+            "maxMissingNumber": 1,
+            "missingTrend": "个位遗漏值整体偏低，冷号1可能补位。"
+          }
+        },
+        "spanAnalysis": {
+          "currentSpan": 8,
+          "spanTrend": "跨度近期波动较大，集中在5-8区间，推荐关注中等跨度值。",
+          "recommendedSpan": [
+            6,
+            7
+          ]
+        },
+        "oddEvenAnalysis": {
+          "currentRatio": "2:1",
+          "ratioTrend": "奇偶比近期以2:1为主，偶数略显强势，建议关注1:2形态。",
+          "recommendedRatio": "1:2"
+        },
+        "groupAnalysis": {
+          "groupDistribution": {
+            "group6": "75%",
+            "group3": "25%",
+            "groupTrend": "组六形态占主导，但组三形态有回补趋势。"
+          },
+          "currentPattern": "当前为组六形态，建议关注组三形态回补。"
+        },
+        "recommendations": [
+          {
+            "strategy": "直选推荐",
+            "numbers": [
+              5,
+              8,
+              6
+            ],
+            "rationale": "基于位置频率、热号延续及和值匹配综合分析得出。"
+          },
+          {
+            "strategy": "组选推荐",
+            "numbers": [
+              5,
+              8,
+              6
+            ],
+            "type": "组六",
+            "rationale": "组六形态频率较高，且号码组合符合热号延续与遗漏补位原则。"
+          },
+          {
+            "strategy": "和值推荐",
+            "sumValue": 16,
+            "possibleNumbers": [
+              [
+                5,
+                8,
+                3
+              ],
+              [
+                6,
+                7,
+                3
+              ],
+              [
+                5,
+                9,
+                2
+              ]
+            ],
+            "rationale": "和值16为历史高频值，且号码组合符合热号与冷号补位规律。"
+          }
+        ],
+        "topRecommendation": {
+          "directSelection": [
+            5,
+            8,
+            6
+          ],
+          "groupSelection": {
+            "type": "组六",
+            "numbers": [
+              5,
+              8,
+              6
+            ]
+          },
+          "rationale": "综合评分最高组合：1. 位置频率40% 2. 热号延续30% 3. 冷号补位20% 4. 奇偶平衡10%"
+        },
+        "riskWarnings": [
+          "理性购彩提醒：彩票具有随机性，过往数据仅供参考。",
+          "历史数据局限性：分析基于有限数据，未来走势可能偏离。",
+          "彩票随机性说明：任何推荐不能保证中奖，请量力而行。"
+        ]
+      }
+    }
+  }
