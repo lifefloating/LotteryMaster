@@ -71,16 +71,30 @@
   - [LotteryMaster-Uniapp](https://github.com/lifefloating/LotteryMaster-Uniapp): 基于uniapp + Vue3 + TypeScript的多端应用
 
 - **测试覆盖率**
-- <a href="#"><img src="https://img.shields.io/badge/Coverage-90.3%25-success" alt="Coverage Badge"/></a>
+- <a href="#"><img src="https://img.shields.io/badge/Coverage-89.67%25-success" alt="Coverage Badge"/></a>
 
   **总体覆盖率指标**
 
   | 指标 | 覆盖率 |
   |------|--------|
-  | Statements | 90.3% |
-  | Branches | 78.97% |
-  | Functions | 90.32% |
-  | Lines | 91.3% |
+  | Statements | 89.67% |
+  | Branches | 76.81% |
+  | Functions | 84.72% |
+  | Lines | 90.52% |
+
+  **各模块覆盖率**
+
+  | 模块 | Statements | Branches | Functions | Lines |
+  |------|------------|----------|-----------|-------|
+  | controllers | 98.59% | 92.85% | 100% | 98.38% |
+  | services | 88.53% | 75.39% | 85% | 89.3% |
+  | constants | 66.66% | 100% | 0% | 100% |
+  | types | 100% | 100% | 100% | 100% |
+
+  **支持的彩票类型测试覆盖**
+  - 双色球 (SSQ)
+  - 大乐透 (DLT)
+  - 福彩3D (FC3D)
 
   **说明**
   - 具体的数据执行 `pnpm run test:coverage` 查看
@@ -156,11 +170,31 @@ curl http://localhost:3008/api/health
 
 ### 🖼️ 接口测试结果
 
-以 api/analyze/dlt 为例，获取结果:
+以下是几个主要接口的示例：
 
-[完整结果](./resultCollections/analyzeDlt.json)
+1. **双色球分析接口**
+   ```bash
+   curl http://localhost:3008/api/analyze/ssq
+   ```
+
+2. **大乐透分析接口**
+   ```bash
+   curl http://localhost:3008/api/analyze/dlt
+   ```
+
+3. **福彩3D分析接口**
+   ```bash
+   curl http://localhost:3008/api/analyze/fc3d
+   ```
+
+[完整结果示例](./resultCollections/analyzeDlt.json)
 
 ### 🧪 运行测试 (Run Tests)
+
+运行所有测试：
+```bash
+pnpm test
+```
 
 运行所有测试并生成覆盖率报告：
 ```bash
