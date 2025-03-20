@@ -1,0 +1,24 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+      "config:recommended",
+      ":semanticCommits"
+    ],
+    "prHourlyLimit": 2,
+    "prConcurrentLimit": 8,
+    "packageRules": [
+      {
+        "matchPackageNames": ["node"],
+        "enabled": false
+      },
+      {
+        "matchPackagePatterns": ["^@fastify/"],
+        "groupName": "fastify packages",
+        "groupSlug": "fastify"
+      },
+      {
+        "matchPackageNames": ["typescript"],
+        "schedule": ["every 3 months"]
+      }
+    ]
+  }
