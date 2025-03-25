@@ -21,7 +21,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@fastify/cors": "11.0.0",
+    "@fastify/cors": "11.0.1",
     "axios": "^1.8.1",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
