@@ -1,5 +1,7 @@
 # LotteryMaster
 
+### ✨ deepwiki
+- https://deepwiki.com/lifefloating/LotteryMaster
 
 ### ✨ 主要功能 (Key Features)
 
