@@ -213,3 +213,9 @@ pnpm test:coverage
   <a href="#"><img src="https://img.shields.io/badge/Status-Beta-yellow" alt="Project Status: Beta"/></a>
   <a href="#"><img src="https://img.shields.io/badge/License-MIT-brightgreen" alt="License: MIT"/></a>
 </p>
+
+<p align="center">
+  <a href="https://www.netlify.com">
+    <img src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg" alt="Deploys by Netlify" />
+  </a>
+<p>
