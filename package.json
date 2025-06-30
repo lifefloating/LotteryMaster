@@ -24,7 +24,7 @@
     "@fastify/cors": "11.0.1",
     "axios": "^1.8.1",
     "cheerio": "^1.0.0",
-    "dotenv": "^16.4.7",
+    "dotenv": "^17.0.0",
     "fastify": "^5.2.1",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
