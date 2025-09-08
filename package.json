@@ -28,7 +28,7 @@
     "fastify": "^5.2.1",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "uuid": "^12.0.0",
+    "uuid": "^13.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
