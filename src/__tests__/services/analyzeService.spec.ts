@@ -1,7 +1,10 @@
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import analyzeService from '../../services/analyzeService';
-import { getDefaultStandardLotteryResult, getDefaultFC3DResult } from '../../constants/dafaultResults';
+import {
+  getDefaultStandardLotteryResult,
+  getDefaultFC3DResult,
+} from '../../constants/dafaultResults';
 
 // Mock dependencies
 jest.mock('axios', () => {
@@ -94,7 +97,8 @@ describe('AnalyzeService', () => {
       choices: [
         {
           message: {
-            content: '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
+            content:
+              '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
           },
         },
       ],
@@ -114,22 +118,22 @@ describe('AnalyzeService', () => {
     (XLSX.utils as any).sheet_to_json = jest.fn().mockReturnValue(mockExcelData);
     // Mock axios.post to return test response
     (axios.post as jest.Mock).mockResolvedValue(mockStandardApiResponse);
-    
+
     // Reset the cache for each test
     (analyzeService as any).cache = new Map();
-    
+
     // Setup default result mocks
     (getDefaultStandardLotteryResult as jest.Mock).mockReturnValue({
       frequencyAnalysis: { frontZone: [], backZone: [] },
       // ... other standard lottery properties
     });
-    
+
     (getDefaultFC3DResult as jest.Mock).mockReturnValue({
-      frequencyAnalysis: { 
-        hundredsPlace: [], 
-        tensPlace: [], 
+      frequencyAnalysis: {
+        hundredsPlace: [],
+        tensPlace: [],
         onesPlace: [],
-        sumValue: { mostFrequent: [], distribution: '' }
+        sumValue: { mostFrequent: [], distribution: '' },
       },
       // ... other FC3D properties
     });
@@ -156,11 +160,11 @@ describe('AnalyzeService', () => {
       expect(XLSX.readFile).toHaveBeenCalledWith('fc3d_test.xlsx');
       expect(XLSX.utils.sheet_to_json).toHaveBeenCalled();
       expect(axios.post).toHaveBeenCalled();
-      
+
       // Verify that the correct prompt and system prompt were used
       const axiosCallArgs = (axios.post as jest.Mock).mock.calls[0][1];
       expect(axiosCallArgs.messages[0].content).toContain('福彩3D');
-      
+
       expect(result).toHaveProperty('structured');
       expect(result.structured).toHaveProperty('frequencyAnalysis');
     });
@@ -180,7 +184,7 @@ describe('AnalyzeService', () => {
       });
 
       await analyzeService.analyzeLotteryData('fc3d_test.xlsx', 'FC3D');
-      
+
       // Verify that getDefaultFC3DResult was called
       expect(getDefaultFC3DResult).toHaveBeenCalled();
     });
@@ -244,7 +248,7 @@ describe('AnalyzeService', () => {
       });
 
       await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
-      
+
       // Verify that getDefaultStandardLotteryResult was called
       expect(getDefaultStandardLotteryResult).toHaveBeenCalled();
     });
@@ -258,7 +262,7 @@ describe('AnalyzeService', () => {
         // Check that the system prompt contains the expected content
         expect(data.messages[0].content).toContain('双色球');
         expect(data.messages[0].content).not.toContain('福彩3D');
-        
+
         return Promise.resolve({
           data: {
             choices: [
@@ -273,7 +277,7 @@ describe('AnalyzeService', () => {
       });
 
       await analyzeService.analyzeLotteryData('test.xlsx', 'SSQ');
-      
+
       // Verify that axios.post was called
       expect(axios.post).toHaveBeenCalled();
     });
@@ -287,13 +291,14 @@ describe('AnalyzeService', () => {
         // Check that the system prompt contains the expected content
         expect(data.messages[0].content).toContain('福彩3D');
         expect(data.messages[0].content).not.toContain('双色球');
-        
+
         return Promise.resolve({
           data: {
             choices: [
               {
                 message: {
-                  content: '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
+                  content:
+                    '```json\n{"frequencyAnalysis":{"hundredsPlace":[],"tensPlace":[],"onesPlace":[]}}\n```',
                 },
               },
             ],
@@ -302,7 +307,7 @@ describe('AnalyzeService', () => {
       });
 
       await analyzeService.analyzeLotteryData('fc3d_test.xlsx', 'FC3D');
-      
+
       // Verify that axios.post was called
       expect(axios.post).toHaveBeenCalled();
     });

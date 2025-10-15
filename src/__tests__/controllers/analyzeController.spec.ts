@@ -44,36 +44,36 @@ describe('Analyze Controller', () => {
 
   const mockFC3DAnalysisResult = {
     structured: {
-      frequencyAnalysis: { 
-        hundredsPlace: [], 
-        tensPlace: [], 
+      frequencyAnalysis: {
+        hundredsPlace: [],
+        tensPlace: [],
         onesPlace: [],
-        sumValue: { mostFrequent: [], distribution: '' }
+        sumValue: { mostFrequent: [], distribution: '' },
       },
       hotColdAnalysis: {
         hundredsPlace: { hotNumbers: [], coldNumbers: [] },
         tensPlace: { hotNumbers: [], coldNumbers: [] },
-        onesPlace: { hotNumbers: [], coldNumbers: [] }
+        onesPlace: { hotNumbers: [], coldNumbers: [] },
       },
       missingAnalysis: {
         hundredsPlace: { maxMissingNumber: 0, missingTrend: '' },
         tensPlace: { maxMissingNumber: 0, missingTrend: '' },
-        onesPlace: { maxMissingNumber: 0, missingTrend: '' }
+        onesPlace: { maxMissingNumber: 0, missingTrend: '' },
       },
       spanAnalysis: { currentSpan: 0, spanTrend: '', recommendedSpan: [] },
       oddEvenAnalysis: { currentRatio: '', ratioTrend: '', recommendedRatio: '' },
-      groupAnalysis: { 
+      groupAnalysis: {
         groupDistribution: { group6: '', group3: '', groupTrend: '' },
-        currentPattern: ''
+        currentPattern: '',
       },
       recommendations: [],
-      topRecommendation: { 
-        directSelection: [], 
+      topRecommendation: {
+        directSelection: [],
         groupSelection: { type: '', numbers: [] },
-        rationale: '' 
+        rationale: '',
       },
-      riskWarnings: []
-    }
+      riskWarnings: [],
+    },
   };
 
   let mockRequest: FastifyRequest;

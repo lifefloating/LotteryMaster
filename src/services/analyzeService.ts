@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { LotteryData, AnalysisResult } from '../types/lottery';
@@ -11,6 +10,7 @@ import {
 import { getDefaultStandardLotteryResult, getDefaultFC3DResult } from '../constants/dafaultResults';
 import config from '../config';
 import { createLogger } from '../utils/logger';
+import { AIProviderFactory } from './aiProvider';
 
 const logger = createLogger('analyzeService');
 
@@ -21,16 +21,7 @@ interface CacheItem {
 }
 
 class AnalyzeService {
-  private readonly API_KEY = config.API_KEY;
-  private readonly API_URL = config.API_URL;
-  private readonly API_TIMEOUT = config.API_TIMEOUT;
-  private readonly TEMPERATURE = config.API_TEMPERATURE;
-  private readonly MAX_TOKENS = config.API_MAX_TOKENS;
-  private readonly TOP_P = config.API_TOP_P;
-  private readonly PRESENCE_PENALTY = config.API_PRESENCE_PENALTY;
   private readonly CACHE_DURATION = config.CACHE_DURATION;
-  private readonly API_MODEL = config.API_MODEL;
-
   private readonly cache: Map<string, CacheItem> = new Map();
 
   // todo redis maybe not
@@ -77,54 +68,24 @@ class AnalyzeService {
       logger.info('Built analysis prompt, sending request to AI service...');
 
       try {
-        const requestBody: any = {
-          model: this.API_MODEL,
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt,
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-        };
+        // Get AI provider based on configuration
+        const aiProvider = AIProviderFactory.getProvider();
+        logger.info(`Using AI Provider: ${aiProvider.name}`);
 
-        // 非 deepseek-r1 模型时添加这些参数
-        if (!this.API_MODEL.includes('deepseek-r1')) {
-          requestBody.temperature = this.TEMPERATURE;
-          requestBody.max_tokens = this.MAX_TOKENS;
-          requestBody.top_p = this.TOP_P;
-          requestBody.presence_penalty = this.PRESENCE_PENALTY;
-        } else {
-          // deepseek-r1 max_tokens 参数
-          requestBody.max_tokens = this.MAX_TOKENS;
-        }
-
-        const response = await axios.post(this.API_URL, requestBody, {
-          headers: {
-            Authorization: `Bearer ${this.API_KEY}`,
-            'Content-Type': 'application/json',
-            'Accept-Encoding': 'gzip,deflate',
-          },
-          timeout: this.API_TIMEOUT,
+        const response = await aiProvider.analyze({
+          data,
+          type,
+          systemPrompt,
+          userPrompt: prompt,
         });
 
-        logger.info('Successfully received response from AI service');
+        logger.info(`Successfully received response from ${response.provider} (${response.model})`);
 
-        // 验证响应数据的完整性
-        if (!response.data) {
-          throw new Error('Empty response from AI service');
-        }
-
-        if (!response.data.choices?.[0]?.message?.content) {
-          logger.error('Invalid API response structure:', JSON.stringify(response.data, null, 2));
-          throw new Error('Invalid response structure from AI service');
-        }
-
-        const rawContent = response.data.choices[0].message.content;
-        logger.info('Raw content from AI service:', rawContent.substring(0, 100) + '...');
+        const rawContent = response.rawContent;
+        logger.info(
+          { preview: rawContent.substring(0, 100) + '...' },
+          'Raw content from AI service'
+        );
 
         // 解析结构化数据
         const result = this.parseStructuredResponse(rawContent, type);
@@ -146,21 +107,8 @@ class AnalyzeService {
       } catch (error) {
         // Log basic error information for any error type
         logger.error(
-          `API Request Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`
+          `AI Provider Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`
         );
-
-        // Additional logging for Axios errors with their specific properties
-        if (axios.isAxiosError(error)) {
-          logger.error(`API Response Data: ${JSON.stringify(error.response?.data || {})}`);
-
-          // Log request data if available
-          if (error.config?.data) {
-            const requestData = JSON.stringify(error.config.data);
-            logger.error(
-              `API Request Data: ${requestData.length > 500 ? requestData.substring(0, 500) + '...' : requestData}`
-            );
-          }
-        }
 
         // Log stack trace if available
         if (error instanceof Error && error.stack) {
@@ -218,10 +166,13 @@ class AnalyzeService {
 
       return STRUCTURED_ANALYSIS_TEMPLATE.replace('${data}', JSON.stringify(recentData, null, 2));
     } catch (error) {
-      logger.error('Error building structured analysis prompt:', {
-        error,
-        dataLength: data?.length,
-      });
+      logger.error(
+        {
+          error,
+          dataLength: data?.length,
+        },
+        'Error building structured analysis prompt'
+      );
       throw error;
     }
   }
@@ -238,10 +189,13 @@ class AnalyzeService {
         JSON.stringify(recentData, null, 2)
       );
     } catch (error) {
-      logger.error('Error building FC3D analysis prompt:', {
-        error,
-        dataLength: data?.length,
-      });
+      logger.error(
+        {
+          error,
+          dataLength: data?.length,
+        },
+        'Error building FC3D analysis prompt'
+      );
       throw error;
     }
   }

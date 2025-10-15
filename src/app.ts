@@ -10,15 +10,22 @@ import * as healthController from './controllers/healthController';
 import * as scrapeController from './controllers/scrapeController';
 import * as analyzeController from './controllers/analyzeController';
 import * as chartController from './controllers/chartController';
+import * as subscriptionController from './controllers/subscriptionController';
 
-logger.info('Environment variables loaded:', {
-  PORT: config.PORT,
-  SSQ_BASE_URL: config.SSQ_BASE_URL,
-  DLT_BASE_URL: config.DLT_BASE_URL,
-  FC3D_BASE_URL: config.FC3D_BASE_URL,
-  DATA_PATH: config.DATA_PATH,
-  CORS_ORIGINS: config.CORS_ORIGINS,
-});
+// Import scheduler
+import schedulerService from './services/schedulerService';
+
+logger.info(
+  {
+    PORT: config.PORT,
+    SSQ_BASE_URL: config.SSQ_BASE_URL,
+    DLT_BASE_URL: config.DLT_BASE_URL,
+    FC3D_BASE_URL: config.FC3D_BASE_URL,
+    DATA_PATH: config.DATA_PATH,
+    CORS_ORIGINS: config.CORS_ORIGINS,
+  },
+  'Environment variables loaded'
+);
 
 const PORT = config.PORT;
 const HOST = '0.0.0.0';
@@ -71,6 +78,26 @@ app.get<{
   };
 }>('/api/chart/frequency', chartController.getFrequencyChart);
 
+// Subscription routes
+// Email config
+app.get('/api/subscription/email-config', subscriptionController.getEmailConfig);
+app.post('/api/subscription/email-config', subscriptionController.saveEmailConfig);
+app.delete('/api/subscription/email-config', subscriptionController.deleteEmailConfig);
+
+// Subscriptions CRUD
+app.get('/api/subscription', subscriptionController.getAllSubscriptions);
+app.get('/api/subscription/:id', subscriptionController.getSubscription);
+app.post('/api/subscription', subscriptionController.createSubscription);
+app.put('/api/subscription/:id', subscriptionController.updateSubscription);
+app.delete('/api/subscription/:id', subscriptionController.deleteSubscription);
+
+// Email sending
+app.post('/api/subscription/test-email', subscriptionController.sendTestEmail);
+app.post('/api/subscription/send-prediction', subscriptionController.sendPredictionEmail);
+
+// Scheduler status
+app.get('/api/subscription/scheduler/status', subscriptionController.getSchedulerStatus);
+
 // Add global uncaught exception handlers
 process.on('uncaughtException', (error: Error) => {
   app.log.error('Uncaught Exception:');
@@ -120,6 +147,10 @@ const start = async (): Promise<void> => {
   try {
     await app.listen({ port: PORT, host: HOST });
     logger.info(`Server is running on port ${PORT}`);
+
+    // Start scheduler for subscriptions
+    schedulerService.start();
+    logger.info('Subscription scheduler started');
     logger.info('Available API endpoints:');
     logger.info('Health Check:');
     logger.info('  - GET /api/health');
