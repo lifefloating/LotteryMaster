@@ -29,7 +29,7 @@
     "pino": "^10.0.0",
     "pino-pretty": "^13.0.0",
     "uuid": "^14.0.0",
-    "xlsx": "^0.18.5"
+    "@e965/xlsx": "^0.20.3"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
